@@ -68,6 +68,13 @@ namespace FernNamespace
             Random random = new Random();
 
             if (size < 2)
+            {
+                Ellipse ellipse = new Ellipse();
+                ellipse.Width = 3;
+                ellipse.Height = 4;
+                EllipseX.SetCenter(ellipse, x1, y1);   
+
+            }
 
 
             for (int i = 0; i < size; i++)
