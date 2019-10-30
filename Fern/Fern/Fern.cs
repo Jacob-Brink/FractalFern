@@ -55,8 +55,6 @@ namespace FernNamespace
                 // compute the angle of the outgoing tendril
                 double theta = i * 2 * Math.PI / TENDRILS;
                 tendril(x, y, size, redux, turnbias, theta, canvas);
-                if (size > BERRYMIN)
-                    berry(x, y, 5, canvas);
             }
         }
 
@@ -64,10 +62,13 @@ namespace FernNamespace
          * tendril draws a tendril (a randomly-wavy line) in the given direction, for the given length, 
          * and draws a cluster at the other end if the line is big enough.
          */
-        private void tendril(int x1, int y1, double size, double redux, double turnbias, double direction, Canvas canvas)
+        private void tendril(int x1, int y1, double size, double density, double turnbias, double direction, Canvas canvas)
         {
             int x2 = x1, y2 = y1;
             Random random = new Random();
+
+            if (size < 2)
+
 
             for (int i = 0; i < size; i++)
             {
@@ -79,9 +80,17 @@ namespace FernNamespace
                 byte green = (byte)(220 - size / 3);
                 //if (size>120) red = 138; green = 108;
                 line(x1, y1, x2, y2, red, green, 0, 1 + size / 80, canvas);
+
+                if ((random.NextDouble() % 1) < density)
+                {
+                    tendril(x1, y1, size / 3, density / 2, turnbias, direction * 1.5, canvas);
+                    tendril(x1, y1, size / 3, density / 2, turnbias, direction * 2, canvas);
+                }
+
+                //draw a perpendicular tendril given density
             }
-            if (size > TENDRILMIN)
-                cluster(x2, y2, size / redux, redux, turnbias, canvas);
+            //if (size > TENDRILMIN)
+            //    cluster(x2, y2, size / redux, redux, turnbias, canvas);
         }
 
         /*

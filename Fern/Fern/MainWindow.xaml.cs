@@ -28,13 +28,13 @@ namespace FernNamespace
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            Fern f = new Fern(sizeSlider.Value, reduxSlider.Value, biasSlider.Value, canvas);
+            Fern f = new Fern(sizeSlider.Value, densitySlider.Value, biasSlider.Value, canvas);
         }
 
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            Fern f = new Fern(sizeSlider.Value, reduxSlider.Value, biasSlider.Value, canvas);
+            Fern f = new Fern(sizeSlider.Value, densitySlider.Value, biasSlider.Value, canvas);
         }
     }
 
