@@ -1,7 +1,7 @@
 ﻿<Window x:Class="FernNamespace.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Fractal Fern Example" Height="543" Width="863" Loaded="Window_Loaded" WindowStyle="ThreeDBorderWindow">
+        Title="Fractal Fern Example" Height="1024" Width="2000" Loaded="Window_Loaded" WindowStyle="ThreeDBorderWindow">
     <Grid Background="#FFF4FFD8">
 
         <Image x:Name="CanvasImage" Margin="192,10,10,10">

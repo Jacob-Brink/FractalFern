@@ -47,7 +47,7 @@ namespace FernNamespace
             this.height = height;
 
             double length, direction;
-            direction = 0;
+            direction = random.NextDouble() * Math.PI / 2;
             for (int j = 0; j < BRANCHES; j++)
             {
                 length = randomInRange(2) + 400;
@@ -125,14 +125,10 @@ namespace FernNamespace
                     growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * 1, turnbias, age, density * 2);
 
                 if ((random.NextDouble()) <= density)
-                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * -1, turnbias, age, density * 2);
-
-                
-                
-                
+                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * -1, turnbias, age, density * 2);                
 
             }
-            System.Drawing.Color color = System.Drawing.Color.FromArgb(100, 200, 0);
+            System.Drawing.Color color = System.Drawing.Color.FromArgb(100 / level, (200 * level) % 255, 0);
             g.DrawCurve(new System.Drawing.Pen(color, 5 / level), branchPoints);
         }
 
