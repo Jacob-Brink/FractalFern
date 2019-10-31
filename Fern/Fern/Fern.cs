@@ -73,7 +73,7 @@ namespace FernNamespace
 
             //ensures that true length is brought out due to points a truncated number of length / SEGLENGTH
             double offset = ((length % segmentLength) / points);
-            double segmentDistance = segmentLength + offset;
+            double segmentDistance = segmentLength * level  + offset;
 
             //initialize and set first point of curve array
             System.Drawing.Point[] branchPoints = new System.Drawing.Point[points];
@@ -116,10 +116,10 @@ namespace FernNamespace
                     }
                     continue;
                 }
-                double smoothnessFactor = .75;
-                double newLength = (length - Math.Atan(smoothnessFactor * i - branchPoints.Length * smoothnessFactor / 4) * 50 - Math.Pow(i, .25) * 100) / 4;
+                double smoothnessFactor = .5;
+                double newLength = (length - Math.Atan(smoothnessFactor * i - branchPoints.Length * smoothnessFactor / 2) * 50 - Math.Pow(i, .25) * 100) / 4;
                 newLength = newLength > 0 ? newLength : 2;
-                double newDirectionOffset = 1.2;
+                double newDirectionOffset = -1 * Math.Atan(smoothnessFactor * i - branchPoints.Length * smoothnessFactor / 8) * Math.PI / 4 + Math.PI / 2;
 
                 if ((random.NextDouble()) <= density)
                     growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * 1, turnbias, age, density * 2);
