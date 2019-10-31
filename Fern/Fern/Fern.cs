@@ -69,13 +69,9 @@ namespace FernNamespace
 
             if (size < 2)
             {
-                Ellipse ellipse = new Ellipse();
-                ellipse.Width = 3;
-                ellipse.Height = 4;
-                EllipseX.SetCenter(ellipse, x1, y1);   
-
+                //leaf(x1, y1, 1, canvas);
             }
-
+            gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggcgfcfcffffffffffffffffffffg
 
             for (int i = 0; i < size; i++)
             {
@@ -88,10 +84,13 @@ namespace FernNamespace
                 //if (size>120) red = 138; green = 108;
                 line(x1, y1, x2, y2, red, green, 0, 1 + size / 80, canvas);
 
+                int next_size = i * 80;
+
                 if ((random.NextDouble() % 1) < density)
                 {
-                    tendril(x1, y1, size / 3, density / 2, turnbias, direction * 1.5, canvas);
-                    tendril(x1, y1, size / 3, density / 2, turnbias, direction * 2, canvas);
+
+                    tendril(x1, y1, size / 5, density / 2, turnbias, direction * 1.5, canvas);
+                    tendril(x1, y1, size / 5, density / 2, turnbias, direction * 2, canvas);
                 }
 
                 //draw a perpendicular tendril given density
@@ -103,18 +102,19 @@ namespace FernNamespace
         /*
          * draw a red circle centered at (x,y), radius radius, with a black edge, onto canvas
          */
-        private void berry(int x, int y, double radius, Canvas canvas)
+        private void leaf(int x, int y, double direction, Canvas canvas)
         {
+            int radius = 3;
             Ellipse myEllipse = new Ellipse();
             SolidColorBrush mySolidColorBrush = new SolidColorBrush();
-            mySolidColorBrush.Color = Color.FromArgb(255, 255, 0, 0);
+            mySolidColorBrush.Color = Color.FromArgb(100, 255, 100, 100);
             myEllipse.Fill = mySolidColorBrush;
             myEllipse.StrokeThickness = 1;
-            myEllipse.Stroke = Brushes.Black;
+            myEllipse.Stroke = Brushes.ForestGreen;
             myEllipse.HorizontalAlignment = HorizontalAlignment.Center;
             myEllipse.VerticalAlignment = VerticalAlignment.Center;
-            myEllipse.Width = 2 * radius;
-            myEllipse.Height = 2 * radius;
+            myEllipse.Width = .25 * radius;
+            myEllipse.Height = .125 * radius;
             myEllipse.SetCenter(x, y);
             canvas.Children.Add(myEllipse);
         }
