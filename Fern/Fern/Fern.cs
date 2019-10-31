@@ -23,8 +23,8 @@ namespace FernNamespace
      */
     class Fern
     {
-        private static double SEGLENGTH = 30;
-        private static int LEVEL_MAX = 3;
+        private static double SEGLENGTH = 15;
+        private static int LEVEL_MAX = 4;
         private static int BRANCHES = 3;
 
         private Graphics g;
@@ -52,7 +52,7 @@ namespace FernNamespace
             {
                 length = randomInRange(2) + 400;
                 direction += random.NextDouble() * Math.PI / 200  +  2 * Math.PI / BRANCHES;
-                growBranch(1, width/2, height/2, length, direction, turnbias, age);
+                growBranch(1, width/2, height/2, length, direction, turnbias, age, density);
             }
         }
 
@@ -61,7 +61,7 @@ namespace FernNamespace
             return random.NextDouble() * range - range / 2;
         }
 
-        private void growBranch(int level, double x, double y, double length, double direction, double turnbias, double age)
+        private void growBranch(int level, double x, double y, double length, double direction, double turnbias, double age, double density)
         {
             if (level >= LEVEL_MAX)
                 return;//todo: add leaves
@@ -69,7 +69,7 @@ namespace FernNamespace
             double segmentLength = SEGLENGTH / level;
 
             //creates number of points relative to length
-            int points = (int)(length / segmentLength);
+            int points = (int)(length / segmentLength) + 2;
 
             //ensures that true length is brought out due to points a truncated number of length / SEGLENGTH
             double offset = ((length % segmentLength) / points);
@@ -102,8 +102,10 @@ namespace FernNamespace
                 branchPoints[i] = new System.Drawing.Point((int) x, (int) y);
 
 
-                Rectangle rect = new Rectangle((int)x , (int)y -2, 5, 5);
-                g.DrawRectangle(new System.Drawing.Pen(System.Drawing.Color.Green, 2), rect);
+                //Rectangle rect = new Rectangle((int)x , (int)y -2, 5, 5);
+                //g.DrawRectangle(new System.Drawing.Pen(System.Drawing.Color.Green, 2), rect);
+                if (level == 1 && i < branchPoints.Length / 9)
+                    continue;
 
                 //branch off either left or right
                 if (level == LEVEL_MAX - 1)
@@ -114,15 +116,17 @@ namespace FernNamespace
                     }
                     continue;
                 }
-                    
+                double smoothnessFactor = .75;
+                double newLength = (length - Math.Atan(smoothnessFactor * i - branchPoints.Length * smoothnessFactor / 4) * 50 - Math.Pow(i, .25) * 100) / 4;
+                newLength = newLength > 0 ? newLength : 2;
+                double newDirectionOffset = 1.2;
 
-                if ((i % 2) >= 3)
-                    continue;
+                if ((random.NextDouble()) <= density)
+                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * 1, turnbias, age, density * 2);
 
-                for (int b = -1; b < 2; b+=2)
-                {
-                    growBranch(level + 1, x, y, length / (.25 * i + 2 + .05 * i * i), direction + (Math.PI / 3) * b, turnbias, age);
-                }
+                if ((random.NextDouble()) <= density)
+                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * -1, turnbias, age, density * 2);
+
                 
                 
                 
