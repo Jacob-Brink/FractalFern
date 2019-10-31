@@ -51,6 +51,23 @@ namespace FernNamespace
             //cluster((int)(canvas.Width / 2), (int)(canvas.Height / 2), size, redux, turnbias, canvas);
         }
 
+        private void growBranch(int level)
+        {
+
+        }
+
+
+        private void createBranch(System.Drawing.Point startPosition, int length, double direction)
+        {
+
+        }
+
+        private void createLeaf(System.Drawing.Point startPosition, double direction)
+        {
+
+        }
+
+
 
     }
 }

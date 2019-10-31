@@ -32,28 +32,33 @@ namespace FernNamespace
             _canvas = new Bitmap((int) this.Width, (int) this.Height);
         }
 
+        private void drawToImage(double size, double density, double turnRadius)
+        {
+            using (Graphics g = Graphics.FromImage(_canvas))
+            {
+                Fern f = new Fern(size, density, turnRadius, g);
+
+                BitmapImage bitmapImage = new BitmapImage();
+                bitmapImage.BeginInit();
+                MemoryStream pngStream = new MemoryStream();
+                _canvas.Save(pngStream, ImageFormat.Png);
+                pngStream.Position = 0;
+                bitmapImage.StreamSource = pngStream;
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.EndInit();
+                CanvasImage.Source = bitmapImage;
+            }
+        }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            Graphics g = Graphics.FromImage(_canvas);
-            g.Clear(System.Drawing.Color.Red);
-            g.FillRectangle(System.Drawing.Brushes.Green, 0, 0, (int) this.Width / 2, (int) this.Height / 2);
-            BitmapImage bitmapImage = new BitmapImage();
-            bitmapImage.BeginInit();
-            MemoryStream pngStream = new MemoryStream();
-            _canvas.Save(pngStream, ImageFormat.Png);
-            pngStream.Position = 0;
-            bitmapImage.StreamSource = pngStream;
-            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-            bitmapImage.EndInit();
-            CanvasImage.Source = bitmapImage;
+            drawToImage(sizeSlider.Value, densitySlider.Value, biasSlider.Value);
         }
 
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            
-
+            drawToImage(sizeSlider.Value, densitySlider.Value, biasSlider.Value);
         }
     }
 
