@@ -31,7 +31,7 @@ namespace FernNamespace
             InitializeComponent();
             _canvas = new Bitmap((int) this.Width, (int) this.Height);
         }
-
+        
         private void drawToImage(double size, double density, double turnRadius)
         {
             using (Graphics g = Graphics.FromImage(_canvas))
@@ -54,7 +54,6 @@ namespace FernNamespace
         {
             drawToImage(sizeSlider.Value, densitySlider.Value, biasSlider.Value);
         }
-
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {

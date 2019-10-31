@@ -27,10 +27,12 @@ namespace FernNamespace
         private static int TENDRILS = 1;
         private static int TENDRILMIN = 10;
         private static double DELTATHETA = 0.1;
-        private static double SEGLENGTH = 3.0;
+        private static double SEGLENGTH = 200;
         private static int LEVEL_MAX = 2;
         private static int SCALE = 10;
+        private static int RESOLUTION = 10;
 
+        private Graphics g;
         /* 
          * Fern constructor erases screen and draws a fern
          * 
@@ -41,19 +43,23 @@ namespace FernNamespace
          */
         public Fern(double size, double redux, double turnbias, Graphics g)
         {
-
-            System.Drawing.Rectangle rect = new Rectangle(-100, 0, 100, 100);
-            g.FillRectangle(System.Drawing.Brushes.Black, rect);
-            g.DrawRectangle(Pens.Black, rect);
-
-            //canvas.Children.Clear();                                // delete old canvas contents
-            // draw a new fern at the center of the canvas with given parameters
-            //cluster((int)(canvas.Width / 2), (int)(canvas.Height / 2), size, redux, turnbias, canvas);
+            this.g = g;
+            growBranch(1, new System.Drawing.Point(0, 0), 100, 1);
         }
 
-        private void growBranch(int level)
-        {
+        private void growBranch(int level, System.Drawing.Point point, double length, double direction)
+        {       
 
+            System.Drawing.Point[] branchPoints = new System.Drawing.Point[RESOLUTION*200];
+          
+            for (int i = 0; i < RESOLUTION*200; i++)
+            {
+                direction += 1;
+                point = new System.Drawing.Point(point.X + (int)(SEGLENGTH * Math.Sin(direction)), point.Y + (int)(SEGLENGTH * Math.Cos(direction)));
+                branchPoints[i] = point;
+            }
+
+            g.DrawCurve(new System.Drawing.Pen(System.Drawing.Color.Red, 20), branchPoints);
         }
 
 

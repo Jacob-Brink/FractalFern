@@ -4,7 +4,7 @@
         Title="Fractal Fern Example" Height="543" Width="863" Loaded="Window_Loaded" WindowStyle="ThreeDBorderWindow">
     <Grid Background="#FFF4FFD8">
 
-        <Image x:Name="CanvasImage" Width="200" Height="600">
+        <Image x:Name="CanvasImage" Margin="192,10,10,10">
             <Image.Source>
                 <BitmapImage DecodePixelWidth="200" UriSource="Flower.jpg" />
             </Image.Source>
