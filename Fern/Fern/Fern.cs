@@ -24,7 +24,7 @@ namespace FernNamespace
     class Fern
     {
         private static double SEGLENGTH = 30;
-        private static int LEVEL_MAX = 4;
+        private static int LEVEL_MAX = 3;
         private static int BRANCHES = 3;
 
         private Graphics g;
@@ -65,12 +65,15 @@ namespace FernNamespace
         {
             if (level >= LEVEL_MAX)
                 return;//todo: add leaves
-            
+
+            double segmentLength = SEGLENGTH / level;
+
             //creates number of points relative to length
-            int points = (int)(length * level / SEGLENGTH) + 2;
+            int points = (int)(length / segmentLength);
+
             //ensures that true length is brought out due to points a truncated number of length / SEGLENGTH
-            double offset = ((length * level / SEGLENGTH) % 1) / points;
-            double segmentDistance = (SEGLENGTH * offset + SEGLENGTH) / (level);
+            double offset = ((length % segmentLength) / points);
+            double segmentDistance = segmentLength + offset;
 
             //initialize and set first point of curve array
             System.Drawing.Point[] branchPoints = new System.Drawing.Point[points];
@@ -86,17 +89,10 @@ namespace FernNamespace
             for (int i = 1; i < branchPoints.Length; i++)
             {
 
-                double relativePosition = .5;
-                if (false)
-                {
-                    
-                    currentOffset = i * 5 *i + 2;
-                } else
-                {
-                    currentOffset = randomInRange(Math.PI / 4 + .05 * i * i) % directionOffsetRange;
-                    currentOffset = random.NextDouble() < turnbias ? currentOffset : 0;
-                    currentOffset += lastDirectionOffset * .75;
-                }
+                currentOffset = randomInRange(Math.PI / 4 + .05 * i * i) % directionOffsetRange;
+                currentOffset = random.NextDouble() < turnbias ? currentOffset : 0;
+                currentOffset += lastDirectionOffset * .75;
+                
                 direction += currentOffset;
                 lastDirectionOffset = currentOffset;
 
@@ -107,20 +103,20 @@ namespace FernNamespace
 
 
                 Rectangle rect = new Rectangle((int)x , (int)y -2, 5, 5);
-                //g.DrawRectangle(new System.Drawing.Pen(System.Drawing.Color.Green, 2), rect);
+                g.DrawRectangle(new System.Drawing.Pen(System.Drawing.Color.Green, 2), rect);
 
                 //branch off either left or right
                 if (level == LEVEL_MAX - 1)
                 {
                     for (int b = -1; b < 2; b += 2)
                     {
-                        createLeaf(x, y, direction + Math.PI / 2 * b);
+                        //createLeaf(x, y, direction + Math.PI / 2 * b, 10 / i * .25 + 4);
                     }
                     continue;
                 }
                     
 
-                if ((i % 2) >= 1)
+                if ((i % 2) >= 3)
                     continue;
 
                 for (int b = -1; b < 2; b+=2)
@@ -136,10 +132,10 @@ namespace FernNamespace
             g.DrawCurve(new System.Drawing.Pen(color, 5 / level), branchPoints);
         }
 
-        private void createLeaf(double x, double y, double direction) { 
+        private void createLeaf(double x, double y, double direction, double size) { 
 
-            int height = 14;
-            int width = 5;
+            double height = 2 * size;
+            double width = 1 * size;
             System.Drawing.Point[] points = new System.Drawing.Point[3];
             
             points[0].X = (int)(x + width / 2 * Math.Cos(direction - Math.PI / 2));
