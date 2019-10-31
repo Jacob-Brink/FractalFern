@@ -23,8 +23,8 @@ namespace FernNamespace
      */
     class Fern
     {
-        private static double SEGLENGTH = 15;
-        private static int LEVEL_MAX = 3;
+        private static double SEGLENGTH = 30;
+        private static int LEVEL_MAX = 4;
         private static int BRANCHES = 3;
 
         private Graphics g;
@@ -39,7 +39,7 @@ namespace FernNamespace
          * Turnbias: how likely to turn right vs. left (0=always left, 0.5 = 50/50, 1.0 = always right)
          * canvas: the canvas that the fern will be drawn on
          */
-        public Fern(double size, double density, double turnbias, Graphics g, int width, int height)
+        public Fern(double age, double density, double turnbias, Graphics g, int width, int height)
         {
             this.random = new Random();
             this.g = g;
@@ -50,9 +50,9 @@ namespace FernNamespace
             direction = 0;
             for (int j = 0; j < BRANCHES; j++)
             {
-                length = randomInRange(2) + 10;
+                length = randomInRange(2) + 400;
                 direction += random.NextDouble() * Math.PI / 200  +  2 * Math.PI / BRANCHES;
-                growBranch(1, width/2, height/2, length, direction, turnbias, density);
+                growBranch(1, width/2, height/2, length, direction, turnbias, age);
             }
         }
 
@@ -65,8 +65,14 @@ namespace FernNamespace
         {
             if (level >= LEVEL_MAX)
                 return;//todo: add leaves
+            
+            //creates number of points relative to length
+            int points = (int)(length * level / SEGLENGTH) + 2;
+            //ensures that true length is brought out due to points a truncated number of length / SEGLENGTH
+            double offset = ((length * level / SEGLENGTH) % 1) / points;
+            double segmentDistance = (SEGLENGTH * offset + SEGLENGTH) / (level);
 
-            int points = (int)length + 3;
+            //initialize and set first point of curve array
             System.Drawing.Point[] branchPoints = new System.Drawing.Point[points];
             System.Drawing.Point point = new System.Drawing.Point((int)x, (int)y);
             branchPoints[0] = point;
@@ -74,50 +80,78 @@ namespace FernNamespace
             double lastDirectionOffset, currentOffset;
             lastDirectionOffset = 0;
 
-            double directionOffsetRange = Math.PI / (8 * level);
+            double directionOffsetRange = Math.PI / (32 * level);
 
 
             for (int i = 1; i < branchPoints.Length; i++)
             {
-                
-                
+
+                double relativePosition = .5;
                 if (false)
                 {
-                    direction += i*i*i *.00025 + i * .0025;
+                    
+                    currentOffset = i * 5 *i + 2;
                 } else
                 {
                     currentOffset = randomInRange(Math.PI / 4 + .05 * i * i) % directionOffsetRange;
                     currentOffset = random.NextDouble() < turnbias ? currentOffset : 0;
-                    
+                    currentOffset += lastDirectionOffset * .75;
                 }
-                direction += currentOffset + lastDirectionOffset * .75;
+                direction += currentOffset;
                 lastDirectionOffset = currentOffset;
 
 
-                x += (SEGLENGTH * length / 5 *  Math.Cos(direction));
-                y += (SEGLENGTH * length / 5 * Math.Sin(direction));
+                x += (segmentDistance *  Math.Cos(direction));
+                y += (segmentDistance * Math.Sin(direction));
                 branchPoints[i] = new System.Drawing.Point((int) x, (int) y);
 
-                
-                
 
-                //branch off either left or right
-                if (true)
-                {
-                    growBranch(level + 1, x, y, length / (1.9 * Math.Pow(i, .5)), direction + (Math.PI / 3), turnbias, age);
-                    growBranch(level + 1, x, y, length / (1.9 * Math.Pow(i, .5)), direction - (Math.PI / 3), turnbias, age);
-                }
-                //Rectangle rect = new Rectangle((int) x - 5, (int)y - 5, 10, 10);
+                Rectangle rect = new Rectangle((int)x , (int)y -2, 5, 5);
                 //g.DrawRectangle(new System.Drawing.Pen(System.Drawing.Color.Green, 2), rect);
 
+                //branch off either left or right
+                if (level == LEVEL_MAX - 1)
+                {
+                    for (int b = -1; b < 2; b += 2)
+                    {
+                        createLeaf(x, y, direction + Math.PI / 2 * b);
+                    }
+                    continue;
+                }
+                    
+
+                if ((i % 2) >= 1)
+                    continue;
+
+                for (int b = -1; b < 2; b+=2)
+                {
+                    growBranch(level + 1, x, y, length / (.25 * i + 2 + .05 * i * i), direction + (Math.PI / 3) * b, turnbias, age);
+                }
+                
+                
+                
+
             }
-            System.Drawing.Color color = System.Drawing.Color.FromArgb(255 / level, 200, 0);
+            System.Drawing.Color color = System.Drawing.Color.FromArgb(100, 200, 0);
             g.DrawCurve(new System.Drawing.Pen(color, 5 / level), branchPoints);
         }
 
-        private void createLeaf(System.Drawing.Point startPosition, double direction)
-        {
+        private void createLeaf(double x, double y, double direction) { 
 
+            int height = 14;
+            int width = 5;
+            System.Drawing.Point[] points = new System.Drawing.Point[3];
+            
+            points[0].X = (int)(x + width / 2 * Math.Cos(direction - Math.PI / 2));
+            points[0].Y = (int)(y + width / 2 * Math.Sin(direction - Math.PI / 2));
+
+            points[1].X = (int)(x + width / 2 * Math.Cos(Math.PI / 2 + direction));
+            points[1].Y = (int)(y + width / 2 * Math.Sin(Math.PI / 2 + direction));
+            
+            points[2].X = (int)(x + width * 1.2 * Math.Cos(direction));
+            points[2].Y = (int)(y + height * 1.2 * Math.Sin(direction));
+
+            g.DrawPolygon(new System.Drawing.Pen(System.Drawing.Color.Green, 4), points);
         }
 
 
