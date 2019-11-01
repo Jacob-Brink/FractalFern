@@ -27,14 +27,14 @@ namespace FernNamespace
          * Turnbias: how likely to turn right vs. left (0=always left, 0.5 = 50/50, 1.0 = always right)
          * canvas: the canvas that the fern will be drawn on
          */
-        public Fern(double fallOff, int redux, double turnBias, Graphics graphics, int width, int height)
+        public Fern(double directionFallOff, double lengthFallOff, double turnBias, Graphics graphics, int width, int height)
         {
             //set instance variables
             this.width = width;
             this.height = height;
             this.graphics = graphics;
 
-            generateMain(1, width / 2, height / 2, 0, START_LENGTH, fallOff, redux, turnBias);
+            generateMain(1, width / 2, height / 2, 0, START_LENGTH, directionFallOff, lengthFallOff, turnBias);
         }
 
         private void generateMain(int level, double startX, double startY, double direction, double length, double directionFallOff, double lengthFallOff, double turnBias)
@@ -58,7 +58,7 @@ namespace FernNamespace
                 x += segmentDistance * Math.Cos(direction);
                 y -= segmentDistance * Math.Sin(direction);
 
-                generateMain(level + 1, x, y, getNewDirection(direction, position, directionFallOff), getNewLength(length, position, directionFallOff), directionFallOff / 2, lengthFallOff / 2, turnBias / 4);
+                generateMain(level + 1, x, y, getNewDirection(direction, position, directionFallOff), getNewLength(length, position, lengthFallOff), directionFallOff / 2, lengthFallOff / 2, turnBias / 4);
             }
 
             graphics.DrawCurve(new Pen(branchColor, 3), pointList);
@@ -68,15 +68,17 @@ namespace FernNamespace
         private double getNewDirection(double currentDirection, double position, double fallOff)
         {
             double directionOffsetRange = Math.PI / 8;
+            double directionOffsetMin = Math.PI / 2;
             double changePosition = 0.2;
-            return currentDirection + Math.Atan(fallOff * position - changePosition) * directionOffsetRange;
+            return currentDirection + Math.Atan(fallOff * position - changePosition) * directionOffsetRange + directionOffsetMin;
         }
 
         private double getNewLength(double currentLength, double position, double fallOff)
         {
-            double factor = 4;
-            int reducingFactor = 3;
-            return (currentLength - Math.Pow(position, fallOff)*factor) / reducingFactor;
+            double factor = 200;
+            int reducingFactor = 2;
+            double changePosition = .5;
+            return (currentLength - Math.Atan(Math.Pow(position, fallOff*2) - changePosition) * factor) / reducingFactor;
         }
 
         private void createLeaf(double x, double y, double direction, double size) {

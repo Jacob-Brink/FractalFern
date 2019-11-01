@@ -37,7 +37,7 @@ namespace FernNamespace
             using (Graphics g = Graphics.FromImage(_canvas))
             {
                 g.Clear(System.Drawing.Color.White);
-                Fern f = new Fern(fallOffSlider.Value, (int)reduxSlider.Value, turnSlider.Value, g, (int) this.Width, (int) this.Height);
+                Fern f = new Fern(directionFallOffSlider.Value, lengthFallOffSlider.Value, turnSlider.Value, g, (int) this.Width, (int) this.Height);
 
                 BitmapImage bitmapImage = new BitmapImage();
                 bitmapImage.BeginInit();
