@@ -12,8 +12,8 @@ namespace FernNamespace
     class Fern
     {
         private static int START_LENGTH = 200;
-        private static System.Drawing.Color leafColor = System.Drawing.Color.FromArgb(200, 10, 100, 10);
-        private static System.Drawing.Color branchColor = System.Drawing.Color.FromArgb(100, 20, 10, 0);
+        private static Color leafColor = Color.FromArgb(200, 10, 100, 10);
+        private static Color branchColor = Color.FromArgb(200, 20, 10, 0);
 
         private Graphics graphics;
         private int width, height;
@@ -34,26 +34,50 @@ namespace FernNamespace
             this.height = height;
             this.graphics = graphics;
 
-            generateMain(1, width / 2, height / 2, START_LENGTH, 0, fallOff, redux, turnBias);
+            generateMain(1, width / 2, height / 2, 0, START_LENGTH, fallOff, redux, turnBias);
         }
 
-        private void generateMain(int level, double startX, double startY, double direction, double length, double fallOff, double redux, double turnBias)
+        private void generateMain(int level, double startX, double startY, double direction, double length, double directionFallOff, double lengthFallOff, double turnBias)
         {
+
+            if (level > 2)
+                return;
+
             int points = 20;
             Point[] pointList = new Point[points];
 
             double x = startX;
             double y = startY;
-
+            double segmentDistance = length / points;
+            double position;
             for (int pointCount = 0; pointCount < points; pointCount++)
             {
-                x += 20;
+                position = (double)pointCount / points;
+
                 pointList[pointCount] = new Point((int)x, (int)y);
+                x += segmentDistance * Math.Cos(direction);
+                y -= segmentDistance * Math.Sin(direction);
+
+                generateMain(level + 1, x, y, getNewDirection(direction, position, directionFallOff), getNewLength(length, position, directionFallOff), directionFallOff / 2, lengthFallOff / 2, turnBias / 4);
             }
+
+            graphics.DrawCurve(new Pen(branchColor, 3), pointList);
 
         }
         
+        private double getNewDirection(double currentDirection, double position, double fallOff)
+        {
+            double directionOffsetRange = Math.PI / 8;
+            double changePosition = 0.2;
+            return currentDirection + Math.Atan(fallOff * position - changePosition) * directionOffsetRange;
+        }
 
+        private double getNewLength(double currentLength, double position, double fallOff)
+        {
+            double factor = 4;
+            int reducingFactor = 3;
+            return (currentLength - Math.Pow(position, fallOff)*factor) / reducingFactor;
+        }
 
         private void createLeaf(double x, double y, double direction, double size) {
             double height = 2 * size;
