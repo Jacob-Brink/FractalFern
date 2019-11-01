@@ -23,9 +23,9 @@ namespace FernNamespace
      */
     class Fern
     {
-        private static double SEGLENGTH = 15;
+        private static double SEGLENGTH = 55;
         private static int LEVEL_MAX = 4;
-        private static int BRANCHES = 3;
+        private static int BRANCHES = 1;
 
         private Graphics g;
         private int width, height;
@@ -50,9 +50,9 @@ namespace FernNamespace
             direction = random.NextDouble() * Math.PI / 2;
             for (int j = 0; j < BRANCHES; j++)
             {
-                length = randomInRange(2) + 400;
+                length = randomInRange(2) + 800;
                 direction += random.NextDouble() * Math.PI / 200  +  2 * Math.PI / BRANCHES;
-                growBranch(1, width/2, height/2, length, direction, turnbias, age, density);
+                growBranch(1, width/2, height/2, age * length, direction, turnbias, age, density);
             }
         }
 
@@ -66,10 +66,10 @@ namespace FernNamespace
             if (level >= LEVEL_MAX)
                 return;//todo: add leaves
 
-            double segmentLength = SEGLENGTH / level;
+            double segmentLength = SEGLENGTH / (level);
 
             //creates number of points relative to length
-            int points = (int)(length / segmentLength) + 2;
+            int points = (int) (length / segmentLength) + 2;
 
             //ensures that true length is brought out due to points a truncated number of length / SEGLENGTH
             double offset = ((length % segmentLength) / points);
@@ -80,15 +80,14 @@ namespace FernNamespace
             System.Drawing.Point point = new System.Drawing.Point((int)x, (int)y);
             branchPoints[0] = point;
 
+            //directional variables
             double lastDirectionOffset, currentOffset;
             lastDirectionOffset = 0;
-
             double directionOffsetRange = Math.PI / (32 * level);
 
 
             for (int i = 1; i < branchPoints.Length; i++)
             {
-
                 currentOffset = randomInRange(Math.PI / 4 + .05 * i * i) % directionOffsetRange;
                 currentOffset = random.NextDouble() < turnbias ? currentOffset : 0;
                 currentOffset += lastDirectionOffset * .75;
@@ -96,16 +95,13 @@ namespace FernNamespace
                 direction += currentOffset;
                 lastDirectionOffset = currentOffset;
 
-
-                x += (segmentDistance *  Math.Cos(direction));
-                y += (segmentDistance * Math.Sin(direction));
+                x += (segmentDistance * (i / branchPoints.Length + 1) * Math.Cos(direction));
+                y += (segmentDistance * (i / branchPoints.Length + 1) * Math.Sin(direction));
                 branchPoints[i] = new System.Drawing.Point((int) x, (int) y);
 
-
-                //Rectangle rect = new Rectangle((int)x , (int)y -2, 5, 5);
-                //g.DrawRectangle(new System.Drawing.Pen(System.Drawing.Color.Green, 2), rect);
-                if (level == 1 && i < branchPoints.Length / 9)
-                    continue;
+                Rectangle rect = new Rectangle((int)x , (int)y -2, 5, 5);
+                g.DrawRectangle(new System.Drawing.Pen(System.Drawing.Color.Green, 2), rect);
+                
 
                 //branch off either left or right
                 if (level == LEVEL_MAX - 1)
@@ -116,18 +112,27 @@ namespace FernNamespace
                     }
                     continue;
                 }
+
+                if ((i*density) < density)
+                    continue;
+
                 double smoothnessFactor = .5;
-                double newLength = (length - Math.Atan(smoothnessFactor * i - branchPoints.Length * smoothnessFactor / 2) * 50 - Math.Pow(i, .25) * 100) / 4;
+                double newLength = (length - Math.Atan(smoothnessFactor * i - branchPoints.Length * smoothnessFactor / 2) * 40 - Math.Pow(i, .25) * 50) / 5;
                 newLength = newLength > 0 ? newLength : 2;
-                double newDirectionOffset = -1 * Math.Atan(smoothnessFactor * i - branchPoints.Length * smoothnessFactor / 8) * Math.PI / 4 + Math.PI / 2;
+                double newDirectionOffset = -1 * Math.Atan(smoothnessFactor * i - branchPoints.Length * smoothnessFactor / 20) * Math.PI / 4 + Math.PI / 2;
 
-                if ((random.NextDouble()) <= density)
-                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * 1, turnbias, age, density * 2);
-
-                if ((random.NextDouble()) <= density)
-                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * -1, turnbias, age, density * 2);                
+                //grow branches staggered
+                if ((i % 2) < 1)
+                {
+                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * 1, turnbias, age, density * 2);                   
+                } else
+                {
+                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * -1, turnbias, age, density * 2);
+                }
 
             }
+
+            //draw curve by points
             System.Drawing.Color color = System.Drawing.Color.FromArgb(100 / level, (200 * level) % 255, 0);
             g.DrawCurve(new System.Drawing.Pen(color, 5 / level), branchPoints);
         }
@@ -144,7 +149,7 @@ namespace FernNamespace
             points[1].X = (int)(x + width / 2 * Math.Cos(Math.PI / 2 + direction));
             points[1].Y = (int)(y + width / 2 * Math.Sin(Math.PI / 2 + direction));
             
-            points[2].X = (int)(x + width * 1.2 * Math.Cos(direction));
+            points[2].X = (int)(x + height * 1.2 * Math.Cos(direction));
             points[2].Y = (int)(y + height * 1.2 * Math.Sin(direction));
 
             g.DrawPolygon(new System.Drawing.Pen(System.Drawing.Color.Green, 4), points);
