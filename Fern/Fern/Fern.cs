@@ -23,9 +23,9 @@ namespace FernNamespace
      */
     class Fern
     {
-        private static double SEGLENGTH = 15;
+        private static double SEGLENGTH = 25;
         private static int LEVEL_MAX = 4;
-        private static int BRANCHES = 3;
+        private static int BRANCHES = 1;
 
         private Graphics g;
         private int width, height;
@@ -64,12 +64,16 @@ namespace FernNamespace
         private void growBranch(int level, double x, double y, double length, double direction, double turnbias, double age, double density)
         {
             if (level >= LEVEL_MAX)
-                return;//todo: add leaves
+            {
 
-            double segmentLength = SEGLENGTH / level;
+                return;
+            }
+                
+
+            double segmentLength = SEGLENGTH / (level * 2);
 
             //creates number of points relative to length
-            int points = (int)(length / segmentLength) + 2;
+            int points = (int)(length / segmentLength) + 5;
 
             //ensures that true length is brought out due to points a truncated number of length / SEGLENGTH
             double offset = ((length % segmentLength) / points);
@@ -112,14 +116,17 @@ namespace FernNamespace
                 {
                     for (int b = -1; b < 2; b += 2)
                     {
-                        //createLeaf(x, y, direction + Math.PI / 2 * b, 10 / i * .25 + 4);
+                        double newSize = 16 / i;
+                        createLeaf(x, y, direction + b * Math.PI / 2, newSize);
                     }
+                    
+                    
                     continue;
                 }
                 double smoothnessFactor = .5;
-                double newLength = (length - Math.Atan(smoothnessFactor * i - branchPoints.Length * smoothnessFactor / 2) * 50 - Math.Pow(i, .25) * 100) / 4;
+                double newLength = (length - Math.Atan(smoothnessFactor * i - branchPoints.Length * smoothnessFactor / 2) * 50 - Math.Pow(i, .25) * 100) / 8;
                 newLength = newLength > 0 ? newLength : 2;
-                double newDirectionOffset = -1 * Math.Atan(smoothnessFactor * i - branchPoints.Length * smoothnessFactor / 8) * Math.PI / 4 + Math.PI / 2;
+                double newDirectionOffset = -1 * Math.Atan(smoothnessFactor * i - branchPoints.Length * smoothnessFactor / 8) * Math.PI / 8 + Math.PI / 2;
 
                 if ((random.NextDouble()) <= density)
                     growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * 1, turnbias, age, density * 2);
@@ -128,7 +135,7 @@ namespace FernNamespace
                     growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * -1, turnbias, age, density * 2);                
 
             }
-            System.Drawing.Color color = System.Drawing.Color.FromArgb(100 / level, (200 * level) % 255, 0);
+            System.Drawing.Color color = System.Drawing.Color.FromArgb(150, 0, 0, 0);
             g.DrawCurve(new System.Drawing.Pen(color, 5 / level), branchPoints);
         }
 
@@ -138,16 +145,21 @@ namespace FernNamespace
             double width = 1 * size;
             System.Drawing.Point[] points = new System.Drawing.Point[3];
             
-            points[0].X = (int)(x + width / 2 * Math.Cos(direction - Math.PI / 2));
-            points[0].Y = (int)(y + width / 2 * Math.Sin(direction - Math.PI / 2));
+            points[0].X = (int)(x - width / 2 * Math.Cos(Math.PI / 2 + direction));
+            points[0].Y = (int)(y - width / 2 * Math.Sin(Math.PI / 2 + direction));
 
             points[1].X = (int)(x + width / 2 * Math.Cos(Math.PI / 2 + direction));
             points[1].Y = (int)(y + width / 2 * Math.Sin(Math.PI / 2 + direction));
             
-            points[2].X = (int)(x + width * 1.2 * Math.Cos(direction));
-            points[2].Y = (int)(y + height * 1.2 * Math.Sin(direction));
+            points[2].X = (int)(x + height * Math.Cos(direction));
+            points[2].Y = (int)(y + height * Math.Sin(direction));
 
-            g.DrawPolygon(new System.Drawing.Pen(System.Drawing.Color.Green, 4), points);
+            int randomRed = (int) (random.NextDouble() * 50);
+            int randomGreen = (int) (random.NextDouble() * 50) + 205;
+            int randomBlue = (int) (random.NextDouble() * 255);
+
+            System.Drawing.Color color = System.Drawing.Color.FromArgb(200, randomRed, randomGreen, randomBlue);
+            g.DrawPolygon(new System.Drawing.Pen(color, 4), points);
         }
 
 
