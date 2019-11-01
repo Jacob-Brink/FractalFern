@@ -96,6 +96,7 @@ namespace FernNamespace
             double x = startPoint.X;
             double y = startPoint.Y;
             int shifted_i;
+
             for (int i = 1; i < branchPoints.Length; ++i)
             {
                 position = (double) i / branchPoints.Length;
@@ -110,27 +111,18 @@ namespace FernNamespace
 
                 branchPoints[i] = new System.Drawing.Point((int)x, (int)y);
 
-                double smoothnessFactor = .25;
-                double newDirectionOffset = -1 * Math.Atan(smoothnessFactor * shifted_i - branchPoints.Length * smoothnessFactor / 20) * Math.PI / 4 + Math.PI / 2;
+                double newDirectionOffset = getNewBranchDirectionOffset(shifted_i, points);
                 double newLength = getLength(level, length, (int) shifted_i, points);
                 
-                int num = 5;
-                if ((i % num) > density * 5)
-                    continue;
+                //if (skippingBranch(density, shifted_i))
+                  //  continue;
 
                 if (position < STEM_CLEARANCE)
                     continue;
 
-                //branch off either left or right
-                if (level == LEVEL_MAX)
-                {
-                    int leafSize = 5 - i * i * 2 / branchPoints.Length;
-                    leafSize = leafSize > 2 ? leafSize : 2;
-                    for (int b = -1; b < 2; b += 2)
-                    {
-                        //createLeaf(x, y, direction + Math.PI / 2 * b, leafSize);
-                    }
-                }
+                //last branch is in same direction
+                if (i == points - 1)
+                    newDirectionOffset = 0;
 
                 //grow branches staggered
                 if ((shifted_i % 2) < 1)
@@ -148,7 +140,12 @@ namespace FernNamespace
             g.DrawCurve(new System.Drawing.Pen(branchColor, 5 / level), branchPoints);
         }
 
-        
+        private double getNewBranchDirectionOffset(int i, int points)
+        {
+            double smoothness = 10;
+            double realism = -1 * Math.Atan(i) * Math.PI / 7;
+            return Math.PI / 2 + realism;
+        }
 
         private double getLength(int level, double currentLength, int positionFromTrunk, int points)
         {
@@ -165,6 +162,12 @@ namespace FernNamespace
             }
             
             return newLength > 0 ? newLength : 2;
+        }
+
+        private bool skippingBranch(int density, int i)
+        {
+            double num = 1 / (density + .01) + 1;
+            return true;
         }
 
         private double getDirectionOffset(int level, double age, int positionFromTrunk, int points, double currentDirection, double lastDirectionOffset, double turnbias)
