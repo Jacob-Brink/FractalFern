@@ -27,7 +27,7 @@ namespace FernNamespace
         private static int LEVEL_MAX = 3;
         private static int BRANCHES = 3;
         private static double STEM_CLEARANCE = .2;
-        private static System.Drawing.Color leafColor = System.Drawing.Color.FromArgb(10, 10, 100, 10);
+        private static System.Drawing.Color leafColor = System.Drawing.Color.FromArgb(200, 10, 100, 10);
         private static System.Drawing.Color branchColor = System.Drawing.Color.FromArgb(100, 0, 0, 0);
 
 
@@ -116,13 +116,14 @@ namespace FernNamespace
                 branchPoints[i] = new System.Drawing.Point((int)x, (int)y);
 
                 //branch off either left or right
-                if (level == LEVEL_MAX)
+                if (level >= LEVEL_MAX-1)
                 {
+                    int leafSize = 5 - i * i * 2 / branchPoints.Length;
+                    leafSize = leafSize > 2 ? leafSize : 2;
                     for (int b = -1; b < 2; b += 2)
                     {
-                        createLeaf(x, y, direction + Math.PI / 2 * b, 4 / i * .25 + 4);
+                        createLeaf(x, y, direction + Math.PI / 2 * b, leafSize);
                     }
-                    continue;
                 }
 
 
@@ -201,8 +202,6 @@ namespace FernNamespace
             
             g.DrawPolygon(new System.Drawing.Pen(leafColor, 4), points);
         }
-
-
 
     }
 }
