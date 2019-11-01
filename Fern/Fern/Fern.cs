@@ -43,11 +43,11 @@ namespace FernNamespace
             if (level > 2)
                 return;
 
-            int points = 20;
+            int points = 5;
             Point[] pointList = new Point[points];
 
-            double x = startX;
-            double y = startY;
+            double x = 100;
+            double y = 100;
             double segmentDistance;
             double position;
             for (int pointCount = 0; pointCount < points; pointCount++)
