@@ -88,13 +88,15 @@ namespace FernNamespace
             lastDirectionOffset = 0;
 
             double segment = segmentDistance;
+            double position = 0; //used for relative position instead of say "i"
             for (int i = 1; i < branchPoints.Length; i++)
             {
+                position = i / points;
                 currentOffset = getDirectionOffset(level, age, i, points, direction, lastDirectionOffset, turnbias);
                 direction += currentOffset;
                 lastDirectionOffset = currentOffset;
                 
-                segment = (segmentDistance * (Math.Pow(i, .85) / branchPoints.Length + 1));
+                segment = (segmentDistance * (Math.Pow(position, .85) / branchPoints.Length + 1));
 
                 x += segment * Math.Cos(direction);
                 y += segment * Math.Sin(direction);
@@ -106,7 +108,7 @@ namespace FernNamespace
                 {
                     for (int b = -1; b < 2; b += 2)
                     {
-                        createLeaf(x, y, direction + Math.PI / 2 * b, 10 / i * .25 + 4);
+                        createLeaf(x, y, direction + Math.PI / 2 * b, 4 / i * .25 + 4);
                     }
                     continue;
                 }
@@ -114,6 +116,10 @@ namespace FernNamespace
                 double smoothnessFactor = .25;
                 double newDirectionOffset = -1 * Math.Atan(smoothnessFactor * i - branchPoints.Length * smoothnessFactor / 20) * Math.PI / 4 + Math.PI / 2;
                 double newLength = getLength(level, length, i, points);
+
+                if (i < 5)
+                    continue;
+
                 int num = 5;
                 if ((i % num) > density * 5)
                     continue;
@@ -131,6 +137,126 @@ namespace FernNamespace
 
             //draw curve by points
             g.DrawCurve(new System.Drawing.Pen(branchColor, 5 / level), branchPoints);
+        }
+
+        private void generateMain(int level, double length, double density, System.Drawing.Point startPoint, double direction, double turnbias, double age)
+        {
+            if (level > LEVEL_MAX)
+                return;//todo: add leaves
+
+            double segmentLength = SEGLENGTH / density;
+
+            //creates number of points relative to length
+            int points = (int)(length / segmentLength) + 2;
+
+            //ensures that true length is brought out due to points a truncated number of length / SEGLENGTH
+            double offset = ((length % segmentLength) / points);
+            double segmentDistance = segmentLength * level + offset;
+
+            //initialize and set first point of curve array
+            System.Drawing.Point[] branchPoints = new System.Drawing.Point[points];
+            branchPoints[0] = startPoint;
+
+            //directional variables
+            double lastDirectionOffset, currentOffset;
+            lastDirectionOffset = 0;
+
+            double segment = segmentDistance;
+            double position = 0; //used for relative position instead of say "i"
+            double x = startPoint.X;
+            double y = startPoint.Y;
+            for (int i = 1; i < branchPoints.Length; i++)
+            {
+                position = i / points;
+                currentOffset = getDirectionOffset(level, age, i, points, direction, lastDirectionOffset, turnbias);
+                direction += currentOffset;
+                lastDirectionOffset = currentOffset;
+
+                segment = (segmentDistance * (Math.Pow(position, .85) / branchPoints.Length + 1));
+
+                x += segment * Math.Cos(direction);
+                y += segment * Math.Sin(direction);
+
+                branchPoints[i] = new System.Drawing.Point((int)x, (int)y);
+
+                //branch off either left or right
+                if (level == LEVEL_MAX - 1)
+                {
+                    for (int b = -1; b < 2; b += 2)
+                    {
+                        createLeaf(x, y, direction + Math.PI / 2 * b, 4 / i * .25 + 4);
+                    }
+                    continue;
+                }
+
+                double smoothnessFactor = .25;
+                double newDirectionOffset = -1 * Math.Atan(smoothnessFactor * i - branchPoints.Length * smoothnessFactor / 20) * Math.PI / 4 + Math.PI / 2;
+                double newLength = getLength(level, length, i, points);
+                
+                int num = 5;
+                if ((i % num) > density * 5)
+                    continue;
+
+                //grow branches staggered
+                if ((i % 2) < 1)
+                {
+                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * 1, turnbias, age, density * 5);
+                }
+                else
+                {
+                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * -1, turnbias, age, density * 5);
+                }
+
+            }
+
+            //draw curve by points
+            g.DrawCurve(new System.Drawing.Pen(branchColor, 5 / level), branchPoints);
+        }
+
+        private System.Drawing.Point generateStem(int level, double length, double density, System.Drawing.Point startPoint, double direction, double turnbias, double age)
+        {
+            double segmentLength = SEGLENGTH / density;
+
+            //creates number of points relative to length
+            int points = (int)(length / segmentLength) + 2;
+
+            //ensures that true length is brought out due to points a truncated number of length / SEGLENGTH
+            double offset = ((length % segmentLength) / points);
+            double segmentDistance = segmentLength * level + offset;
+
+            //initialize and set first point of curve array
+            System.Drawing.Point[] branchPoints = new System.Drawing.Point[points];
+            branchPoints[0] = startPoint;
+
+            //directional variables
+            double lastDirectionOffset, currentOffset;
+            lastDirectionOffset = 0;
+
+            double segment = segmentDistance;
+            double position = 0; //used for relative position instead of say "i"
+            double x = startPoint.X;
+            double y = startPoint.Y;
+
+            for (int i = 1; i < branchPoints.Length; i++)
+            {
+                position = i / points;
+                currentOffset = getDirectionOffset(level, age, i, points, direction, lastDirectionOffset, turnbias);
+                direction += currentOffset;
+                lastDirectionOffset = currentOffset;
+
+                segment = (segmentDistance * (Math.Pow(position, .85) / branchPoints.Length + 1));
+
+                x += segment * Math.Cos(direction);
+                y += segment * Math.Sin(direction);
+
+                branchPoints[i] = new System.Drawing.Point((int)x, (int)y);
+
+            }
+
+            //draw curve by points
+            g.DrawCurve(new System.Drawing.Pen(branchColor, 5 / level), branchPoints);
+
+            return new System.Drawing.Point((int)x, (int)y);
         }
 
         private double getLength(int level, double currentLength, int positionFromTrunk, int points)
