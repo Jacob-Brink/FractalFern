@@ -24,7 +24,7 @@ namespace FernNamespace
     class Fern
     {
         private static double SEGLENGTH = 55;
-        private static int LEVEL_MAX = 4;
+        private static int LEVEL_MAX = 5;
         private static int BRANCHES = 1;
 
         private Graphics g;
@@ -66,7 +66,7 @@ namespace FernNamespace
             if (level >= LEVEL_MAX)
                 return;//todo: add leaves
 
-            double segmentLength = SEGLENGTH / (level);
+            double segmentLength = SEGLENGTH / density;
 
             //creates number of points relative to length
             int points = (int) (length / segmentLength) + 2;
@@ -95,12 +95,12 @@ namespace FernNamespace
                 direction += currentOffset;
                 lastDirectionOffset = currentOffset;
 
-                x += (segmentDistance * (i / branchPoints.Length + 1) * Math.Cos(direction));
-                y += (segmentDistance * (i / branchPoints.Length + 1) * Math.Sin(direction));
+                x += (segmentDistance  * Math.Cos(direction));
+                y += (segmentDistance  * Math.Sin(direction));
                 branchPoints[i] = new System.Drawing.Point((int) x, (int) y);
 
-                Rectangle rect = new Rectangle((int)x , (int)y -2, 5, 5);
-                g.DrawRectangle(new System.Drawing.Pen(System.Drawing.Color.Green, 2), rect);
+                //Rectangle rect = new Rectangle((int)x , (int)y -2, 5, 5);
+                //g.DrawRectangle(new System.Drawing.Pen(System.Drawing.Color.Green, 2), rect);
                 
 
                 //branch off either left or right
@@ -113,9 +113,6 @@ namespace FernNamespace
                     continue;
                 }
 
-                if ((i*density) < density)
-                    continue;
-
                 double smoothnessFactor = .5;
                 double newLength = (length - Math.Atan(smoothnessFactor * i - branchPoints.Length * smoothnessFactor / 2) * 40 - Math.Pow(i, .25) * 50) / 5;
                 newLength = newLength > 0 ? newLength : 2;
@@ -124,10 +121,10 @@ namespace FernNamespace
                 //grow branches staggered
                 if ((i % 2) < 1)
                 {
-                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * 1, turnbias, age, density * 2);                   
+                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * 1, turnbias, age, density * 4);                   
                 } else
                 {
-                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * -1, turnbias, age, density * 2);
+                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * -1, turnbias, age, density * 4);
                 }
 
             }
