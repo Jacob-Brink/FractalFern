@@ -24,9 +24,10 @@ namespace FernNamespace
     class Fern
     {
         private static double SEGLENGTH = 55;
-        private static int LEVEL_MAX = 4;
+        private static int LEVEL_MAX = 3;
         private static int BRANCHES = 3;
-        private static System.Drawing.Color leafColor = System.Drawing.Color.FromArgb(0, 10, 100, 10);
+        private static double STEM_CLEARANCE = .2;
+        private static System.Drawing.Color leafColor = System.Drawing.Color.FromArgb(10, 10, 100, 10);
         private static System.Drawing.Color branchColor = System.Drawing.Color.FromArgb(100, 0, 0, 0);
 
 
@@ -97,9 +98,12 @@ namespace FernNamespace
             double r; //used for relative position instead of say "i"
             double x = startPoint.X;
             double y = startPoint.Y;
+            int shifted_i;
             for (int i = 1; i < branchPoints.Length; ++i)
             {
-                r = i / branchPoints.Length;
+                r = (double)i / branchPoints.Length;
+                shifted_i = (int) (i -  STEM_CLEARANCE * branchPoints.Length);
+
                 currentOffset = getDirectionOffset(level, age, i, points, direction, lastDirectionOffset, turnbias);
                 direction += currentOffset;
                 lastDirectionOffset = currentOffset;
@@ -123,18 +127,18 @@ namespace FernNamespace
 
 
                 double smoothnessFactor = .25;
-                double newDirectionOffset = -1 * Math.Atan(smoothnessFactor * i - branchPoints.Length * smoothnessFactor / 20) * Math.PI / 4 + Math.PI / 2;
-                double newLength = getLength(level, length, i, points);
+                double newDirectionOffset = -1 * Math.Atan(smoothnessFactor * shifted_i - branchPoints.Length * smoothnessFactor / 20) * Math.PI / 4 + Math.PI / 2;
+                double newLength = getLength(level, length, (int) shifted_i, points);
                 
                 int num = 5;
                 if ((i % num) > density * 5)
                     continue;
 
-                if (r <= 0.0)
+                if (r < STEM_CLEARANCE)
                     continue;
 
                 //grow branches staggered
-                if ((i % 2) < 1)
+                if ((shifted_i % 2) < 1)
                 {
                     growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * 1, turnbias, age, density * 5);
                 }
@@ -153,9 +157,18 @@ namespace FernNamespace
 
         private double getLength(int level, double currentLength, int positionFromTrunk, int points)
         {
-            double smoothnessFactor = .25;
-            double changeLocation = 1 / 5; //where fern changes direction by a significant amount ___/--------
-            double newLength = (currentLength - Math.Atan(smoothnessFactor * positionFromTrunk - points * changeLocation) * 30 - Math.Pow(positionFromTrunk, .15) * 50) / 5;
+
+            double newLength;
+            if (level == 1)
+            {
+                double smoothnessFactor = .25;
+                double changeLocation = 1 / 5; //where fern changes direction by a significant amount ___/--------
+                newLength = (currentLength - Math.Atan(smoothnessFactor * positionFromTrunk - points * changeLocation) * 30 - Math.Pow(positionFromTrunk, .15) * 50) / 5;
+            } else
+            {
+                newLength = (currentLength - positionFromTrunk * 2) / 3;
+            }
+            
             return newLength > 0 ? newLength : 2;
         }
 
