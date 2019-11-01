@@ -54,9 +54,9 @@ namespace FernNamespace
             direction = random.NextDouble() * Math.PI / 2;
             for (int j = 0; j < BRANCHES; j++)
             {
-                length = randomInRange(2) + 800;
+                length = randomInRange(2) + 200;
                 direction += random.NextDouble() * Math.PI / 200  +  2 * Math.PI / BRANCHES;
-                growBranch(1, width/2, height/2, age * length, direction, turnbias, age, density);
+                growBranch(1, width/2, height/2, length * (1+age), direction, turnbias, age, density);
             }
         }
 
@@ -140,11 +140,11 @@ namespace FernNamespace
                 //grow branches staggered
                 if ((shifted_i % 2) < 1)
                 {
-                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * 1, turnbias, age, density * 5);
+                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * 1, turnbias, age * 2, density * 5);
                 }
                 else
                 {
-                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * -1, turnbias, age, density * 5);
+                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * -1, turnbias, age * 2, density * 5);
                 }
 
             }
@@ -174,9 +174,12 @@ namespace FernNamespace
 
         private double getDirectionOffset(int level, double age, int positionFromTrunk, int points, double currentDirection, double lastDirectionOffset, double turnbias)
         {
+            //spiral for young unfurled ferns
             double directionOffsetRange = Math.PI / (4 * level * points);
-            double nextOffset = randomInRange(Math.PI / 4 + .05 * Math.Pow(positionFromTrunk, 2)) % directionOffsetRange;
-            nextOffset = random.NextDouble() < turnbias ? nextOffset : 0;
+            double nextOffset = (randomInRange(Math.PI / 4 + .05 * Math.Pow(positionFromTrunk, 2))) % directionOffsetRange;
+
+            nextOffset += age * positionFromTrunk * .05;
+
             nextOffset += lastDirectionOffset * .75;
             return nextOffset;
         }
