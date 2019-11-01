@@ -25,7 +25,7 @@ namespace FernNamespace
     {
         private static double SEGLENGTH = 50;
         private static int LEVEL_MAX = 3;
-        private static int BRANCHES = 3;
+        private static int BRANCHES = 1;
         private static double STEM_CLEARANCE = .3;
         private static System.Drawing.Color leafColor = System.Drawing.Color.FromArgb(200, 10, 100, 10);
         private static System.Drawing.Color branchColor = System.Drawing.Color.FromArgb(100, 0, 0, 0);
@@ -43,20 +43,21 @@ namespace FernNamespace
          * Turnbias: how likely to turn right vs. left (0=always left, 0.5 = 50/50, 1.0 = always right)
          * canvas: the canvas that the fern will be drawn on
          */
-        public Fern(double age, double density, double turnbias, Graphics g, int width, int height)
+        public Fern(double size, double density, double turnbias, Graphics g, int width, int height)
         {
+            //set instance variables
             this.random = new Random();
             this.g = g;
             this.width = width;
             this.height = height;
 
             double length, direction;
-            direction = random.NextDouble() * Math.PI / 2;
+            direction = 0;// random.NextDouble() * Math.PI / 2;
             for (int j = 0; j < BRANCHES; j++)
             {
-                length = randomInRange(2) + 200;
-                direction += random.NextDouble() * Math.PI / 200  +  2 * Math.PI / BRANCHES;
-                growBranch(1, width/2, height/2, length * (1+age), direction, turnbias, age, density);
+                length = randomInRange(2) + 1600;
+                //direction += random.NextDouble() * Math.PI / 200  +  2 * Math.PI / BRANCHES;
+                growBranch(1, width/2, height/2, size * length, direction, turnbias, 0, density);
             }
         }
 
@@ -75,16 +76,13 @@ namespace FernNamespace
         private void generateMain(int level, double length, double density, System.Drawing.Point startPoint, double direction, double turnbias, double age)
         {
             if (level > LEVEL_MAX)
-                return;//todo: add leaves
-
-            double segmentLength = SEGLENGTH / density;
+                return;
 
             //creates number of points relative to length
-            int points = (int)(length / segmentLength) + 2;
+            int points = 20;
 
-            //ensures that true length is brought out due to points a truncated number of length / SEGLENGTH
-            double offset = ((length % segmentLength) / points);
-            double segmentDistance = segmentLength * level + offset;
+            //get segmentLength
+            double segmentLength = length / points;
 
             //initialize and set first point of curve array
             System.Drawing.Point[] branchPoints = new System.Drawing.Point[points];
@@ -94,24 +92,21 @@ namespace FernNamespace
             double lastDirectionOffset, currentOffset;
             lastDirectionOffset = 0;
 
-            double segment = segmentDistance;
-            double r; //used for relative position instead of say "i"
+            double position;
             double x = startPoint.X;
             double y = startPoint.Y;
             int shifted_i;
             for (int i = 1; i < branchPoints.Length; ++i)
             {
-                r = (double)i / branchPoints.Length;
+                position = (double) i / branchPoints.Length;
                 shifted_i = (int) (i -  STEM_CLEARANCE * branchPoints.Length);
 
                 currentOffset = getDirectionOffset(level, age, i, points, direction, lastDirectionOffset, turnbias);
-                direction += currentOffset;
+                //direction += currentOffset;
                 lastDirectionOffset = currentOffset;
 
-                segment = (segmentDistance * Math.Pow(r+1, 2));
-
-                x += segment * Math.Cos(direction);
-                y += segment * Math.Sin(direction);
+                x += segmentLength * Math.Cos(direction);
+                y += segmentLength * Math.Sin(direction);
 
                 branchPoints[i] = new System.Drawing.Point((int)x, (int)y);
 
@@ -123,7 +118,7 @@ namespace FernNamespace
                 if ((i % num) > density * 5)
                     continue;
 
-                if (r < STEM_CLEARANCE)
+                if (position < STEM_CLEARANCE)
                     continue;
 
                 //branch off either left or right
@@ -133,7 +128,7 @@ namespace FernNamespace
                     leafSize = leafSize > 2 ? leafSize : 2;
                     for (int b = -1; b < 2; b += 2)
                     {
-                        createLeaf(x, y, direction + Math.PI / 2 * b, leafSize);
+                        //createLeaf(x, y, direction + Math.PI / 2 * b, leafSize);
                     }
                 }
 
