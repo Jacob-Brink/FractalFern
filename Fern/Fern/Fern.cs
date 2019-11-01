@@ -80,16 +80,17 @@ namespace FernNamespace
         
         private double getNewDirection(double currentDirection, double position, double fallOff)
         {
-            double directionOffsetRange = Math.PI / 6;
-            double directionOffsetMin = Math.PI / 2;
-            double changePosition = 0.2;
-            return currentDirection - Math.Atan(Math.Pow(position, fallOff*2) - changePosition) * directionOffsetRange + directionOffsetMin;
+            //double directionOffsetRange = Math.PI / 6;
+            //double directionOffsetMin = Math.PI / 2;
+            //double changePosition = 0.2;
+            //return currentDirection - Math.Atan(Math.Pow(position, fallOff*2) - changePosition) * directionOffsetRange + directionOffsetMin;
+            return Math.Pow(1 - position, .5) * Math.PI / 2 + currentDirection;
         }
 
         private double getNewLength(double currentLength, double position, double fallOff)
         {
             double factor = 200;
-            int reducingFactor = 2;
+            int reducingFactor = 4;
             double changePosition = .5;
             return (currentLength - Math.Atan(Math.Pow(position, fallOff*2) - changePosition) * factor) / reducingFactor;
         }
