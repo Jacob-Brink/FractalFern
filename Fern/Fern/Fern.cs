@@ -23,10 +23,10 @@ namespace FernNamespace
      */
     class Fern
     {
-        private static double SEGLENGTH = 55;
+        private static double SEGLENGTH = 50;
         private static int LEVEL_MAX = 3;
         private static int BRANCHES = 3;
-        private static double STEM_CLEARANCE = .2;
+        private static double STEM_CLEARANCE = .3;
         private static System.Drawing.Color leafColor = System.Drawing.Color.FromArgb(200, 10, 100, 10);
         private static System.Drawing.Color branchColor = System.Drawing.Color.FromArgb(100, 0, 0, 0);
 
@@ -108,24 +108,12 @@ namespace FernNamespace
                 direction += currentOffset;
                 lastDirectionOffset = currentOffset;
 
-                segment = (segmentDistance * (r / branchPoints.Length + 1));
+                segment = (segmentDistance * Math.Pow(r+1, 2));
 
                 x += segment * Math.Cos(direction);
                 y += segment * Math.Sin(direction);
 
                 branchPoints[i] = new System.Drawing.Point((int)x, (int)y);
-
-                //branch off either left or right
-                if (level >= LEVEL_MAX-1)
-                {
-                    int leafSize = 5 - i * i * 2 / branchPoints.Length;
-                    leafSize = leafSize > 2 ? leafSize : 2;
-                    for (int b = -1; b < 2; b += 2)
-                    {
-                        createLeaf(x, y, direction + Math.PI / 2 * b, leafSize);
-                    }
-                }
-
 
                 double smoothnessFactor = .25;
                 double newDirectionOffset = -1 * Math.Atan(smoothnessFactor * shifted_i - branchPoints.Length * smoothnessFactor / 20) * Math.PI / 4 + Math.PI / 2;
@@ -137,6 +125,17 @@ namespace FernNamespace
 
                 if (r < STEM_CLEARANCE)
                     continue;
+
+                //branch off either left or right
+                if (level == LEVEL_MAX)
+                {
+                    int leafSize = 5 - i * i * 2 / branchPoints.Length;
+                    leafSize = leafSize > 2 ? leafSize : 2;
+                    for (int b = -1; b < 2; b += 2)
+                    {
+                        createLeaf(x, y, direction + Math.PI / 2 * b, leafSize);
+                    }
+                }
 
                 //grow branches staggered
                 if ((shifted_i % 2) < 1)
