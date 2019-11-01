@@ -83,14 +83,11 @@ namespace FernNamespace
             //directional variables
             double lastDirectionOffset, currentOffset;
             lastDirectionOffset = 0;
-            double directionOffsetRange = Math.PI / (32 * level);
 
             double segment = segmentDistance;
             for (int i = 1; i < branchPoints.Length; i++)
             {
-                currentOffset = randomInRange(Math.PI / 4 + .05 * i * i) % directionOffsetRange;
-                currentOffset = random.NextDouble() < turnbias ? currentOffset : 0;
-                currentOffset += lastDirectionOffset * .75;
+                currentOffset = getDirectionOffset(level, age, i, direction, lastDirectionOffset, turnbias);
                 
                 direction += currentOffset;
                 lastDirectionOffset = currentOffset;
@@ -140,6 +137,17 @@ namespace FernNamespace
             double newLength = (currentLength - Math.Atan(smoothnessFactor * positionFromTrunk - points * smoothnessFactor / 2) * 40 - Math.Pow(positionFromTrunk, .25) * 50) / 5;
             return newLength > 0 ? newLength : 2;
         }
+
+        private double getDirectionOffset(int level, double age, int positionFromTrunk, double currentDirection, double lastDirectionOffset, double turnbias)
+        {
+            double directionOffsetRange = Math.PI / (32 * level);
+            double nextOffset = randomInRange(Math.PI / 4 + .05 * Math.Pow(positionFromTrunk, 2)) % directionOffsetRange;
+            nextOffset = random.NextDouble() < turnbias ? nextOffset : 0;
+            nextOffset += lastDirectionOffset * .75;
+
+            return nextOffset;
+        }
+
 
         private void createLeaf(double x, double y, double direction, double size) { 
 
