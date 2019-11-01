@@ -25,7 +25,10 @@ namespace FernNamespace
     {
         private static double SEGLENGTH = 55;
         private static int LEVEL_MAX = 4;
-        private static int BRANCHES = 1;
+        private static int BRANCHES = 3;
+        private static System.Drawing.Color leafColor = System.Drawing.Color.FromArgb(100, 10, 100, 10);
+        private static System.Drawing.Color branchColor = System.Drawing.Color.FromArgb(100, 0, 0, 0);
+
 
         private Graphics g;
         private int width, height;
@@ -63,7 +66,7 @@ namespace FernNamespace
 
         private void growBranch(int level, double x, double y, double length, double direction, double turnbias, double age, double density)
         {
-            if (level >= LEVEL_MAX)
+            if (level > LEVEL_MAX)
                 return;//todo: add leaves
 
             double segmentLength = SEGLENGTH / density;
@@ -87,19 +90,16 @@ namespace FernNamespace
             double segment = segmentDistance;
             for (int i = 1; i < branchPoints.Length; i++)
             {
-                currentOffset = getDirectionOffset(level, age, i, direction, lastDirectionOffset, turnbias);
-                
+                currentOffset = getDirectionOffset(level, age, i, points, direction, lastDirectionOffset, turnbias);
                 direction += currentOffset;
                 lastDirectionOffset = currentOffset;
                 
-                segment = (segmentDistance * (Math.Pow(i, .5) / branchPoints.Length + 1));
+                segment = (segmentDistance * (Math.Pow(i, .85) / branchPoints.Length + 1));
+
                 x += segment * Math.Cos(direction);
                 y += segment * Math.Sin(direction);
-                branchPoints[i] = new System.Drawing.Point((int) x, (int) y);
-
-                //Rectangle rect = new Rectangle((int)x , (int)y -2, 5, 5);
-                //g.DrawRectangle(new System.Drawing.Pen(System.Drawing.Color.Green, 2), rect);
                 
+                branchPoints[i] = new System.Drawing.Point((int) x, (int) y);
 
                 //branch off either left or right
                 if (level == LEVEL_MAX - 1)
@@ -111,46 +111,47 @@ namespace FernNamespace
                     continue;
                 }
 
-                double smoothnessFactor = .5;
-                
+                double smoothnessFactor = .25;
                 double newDirectionOffset = -1 * Math.Atan(smoothnessFactor * i - branchPoints.Length * smoothnessFactor / 20) * Math.PI / 4 + Math.PI / 2;
                 double newLength = getLength(level, length, i, points);
+                int num = 5;
+                if ((i % num) > density * 5)
+                    continue;
+
                 //grow branches staggered
                 if ((i % 2) < 1)
                 {
-                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * 1, turnbias, age, density * 4);                   
+                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * 1, turnbias, age, density * 5);                   
                 } else
                 {
-                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * -1, turnbias, age, density * 4);
+                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * -1, turnbias, age, density * 5);
                 }
 
             }
 
             //draw curve by points
-            System.Drawing.Color color = System.Drawing.Color.FromArgb(100 / level, (200 * level) % 255, 0);
-            g.DrawCurve(new System.Drawing.Pen(color, 5 / level), branchPoints);
+            g.DrawCurve(new System.Drawing.Pen(branchColor, 5 / level), branchPoints);
         }
 
         private double getLength(int level, double currentLength, int positionFromTrunk, int points)
         {
             double smoothnessFactor = .25;
-            double newLength = (currentLength - Math.Atan(smoothnessFactor * positionFromTrunk - points * smoothnessFactor / 2) * 40 - Math.Pow(positionFromTrunk, .25) * 50) / 5;
+            double changeLocation = 1 / 5; //where fern changes direction by a significant amount ___/--------
+            double newLength = (currentLength - Math.Atan(smoothnessFactor * positionFromTrunk - points * changeLocation) * 30 - Math.Pow(positionFromTrunk, .15) * 50) / 5;
             return newLength > 0 ? newLength : 2;
         }
 
-        private double getDirectionOffset(int level, double age, int positionFromTrunk, double currentDirection, double lastDirectionOffset, double turnbias)
+        private double getDirectionOffset(int level, double age, int positionFromTrunk, int points, double currentDirection, double lastDirectionOffset, double turnbias)
         {
-            double directionOffsetRange = Math.PI / (32 * level);
+            double directionOffsetRange = Math.PI / (8 * level * points);
             double nextOffset = randomInRange(Math.PI / 4 + .05 * Math.Pow(positionFromTrunk, 2)) % directionOffsetRange;
             nextOffset = random.NextDouble() < turnbias ? nextOffset : 0;
             nextOffset += lastDirectionOffset * .75;
-
             return nextOffset;
         }
 
 
-        private void createLeaf(double x, double y, double direction, double size) { 
-
+        private void createLeaf(double x, double y, double direction, double size) {
             double height = 2 * size;
             double width = 1 * size;
             System.Drawing.Point[] points = new System.Drawing.Point[3];
@@ -163,8 +164,8 @@ namespace FernNamespace
             
             points[2].X = (int)(x + height * 1.2 * Math.Cos(direction));
             points[2].Y = (int)(y + height * 1.2 * Math.Sin(direction));
-
-            g.DrawPolygon(new System.Drawing.Pen(System.Drawing.Color.Green, 4), points);
+            
+            g.DrawPolygon(new System.Drawing.Pen(leafColor, 4), points);
         }
 
 
