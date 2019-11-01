@@ -140,11 +140,11 @@ namespace FernNamespace
                 //grow branches staggered
                 if ((shifted_i % 2) < 1)
                 {
-                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * 1, turnbias, age * 2, density * 5);
+                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * 1, turnbias, age, density * 5);
                 }
                 else
                 {
-                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * -1, turnbias, age * 2, density * 5);
+                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * -1, turnbias, age, density * 5);
                 }
 
             }
@@ -178,7 +178,7 @@ namespace FernNamespace
             double directionOffsetRange = Math.PI / (4 * level * points);
             double nextOffset = (randomInRange(Math.PI / 4 + .05 * Math.Pow(positionFromTrunk, 2))) % directionOffsetRange;
 
-            nextOffset += age * positionFromTrunk * .05;
+            nextOffset += age * positionFromTrunk * .005;
 
             nextOffset += lastDirectionOffset * .75;
             return nextOffset;
