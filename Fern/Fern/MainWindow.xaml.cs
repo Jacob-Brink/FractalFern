@@ -32,12 +32,12 @@ namespace FernNamespace
             _canvas = new Bitmap((int) this.Width, (int) this.Height);
         }
         
-        private void drawToImage(double size, double density, double turnRadius)
+        private void drawToImage()
         {
             using (Graphics g = Graphics.FromImage(_canvas))
             {
                 g.Clear(System.Drawing.Color.White);
-                Fern f = new Fern(size, density, turnRadius, g, (int) this.Width, (int) this.Height);
+                Fern f = new Fern(fallOffSlider.Value, (int)reduxSlider.Value, turnSlider.Value, g, (int) this.Width, (int) this.Height);
 
                 BitmapImage bitmapImage = new BitmapImage();
                 bitmapImage.BeginInit();
@@ -53,12 +53,12 @@ namespace FernNamespace
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            drawToImage(ageSlider.Value, densitySlider.Value, biasSlider.Value);
+            drawToImage();
         }
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            drawToImage(ageSlider.Value, densitySlider.Value, biasSlider.Value);
+            drawToImage();
         }
     }
 
