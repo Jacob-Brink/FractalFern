@@ -24,7 +24,7 @@ namespace FernNamespace
     class Fern
     {
         private static double SEGLENGTH = 55;
-        private static int LEVEL_MAX = 5;
+        private static int LEVEL_MAX = 4;
         private static int BRANCHES = 1;
 
         private Graphics g;
@@ -85,7 +85,7 @@ namespace FernNamespace
             lastDirectionOffset = 0;
             double directionOffsetRange = Math.PI / (32 * level);
 
-
+            double segment = segmentDistance;
             for (int i = 1; i < branchPoints.Length; i++)
             {
                 currentOffset = randomInRange(Math.PI / 4 + .05 * i * i) % directionOffsetRange;
@@ -94,9 +94,10 @@ namespace FernNamespace
                 
                 direction += currentOffset;
                 lastDirectionOffset = currentOffset;
-
-                x += (segmentDistance  * Math.Cos(direction));
-                y += (segmentDistance  * Math.Sin(direction));
+                
+                segment = (segmentDistance * (Math.Pow(i, .5) / branchPoints.Length + 1));
+                x += segment * Math.Cos(direction);
+                y += segment * Math.Sin(direction);
                 branchPoints[i] = new System.Drawing.Point((int) x, (int) y);
 
                 //Rectangle rect = new Rectangle((int)x , (int)y -2, 5, 5);
@@ -114,10 +115,9 @@ namespace FernNamespace
                 }
 
                 double smoothnessFactor = .5;
-                double newLength = (length - Math.Atan(smoothnessFactor * i - branchPoints.Length * smoothnessFactor / 2) * 40 - Math.Pow(i, .25) * 50) / 5;
-                newLength = newLength > 0 ? newLength : 2;
+                
                 double newDirectionOffset = -1 * Math.Atan(smoothnessFactor * i - branchPoints.Length * smoothnessFactor / 20) * Math.PI / 4 + Math.PI / 2;
-
+                double newLength = getLength(level, length, i, points);
                 //grow branches staggered
                 if ((i % 2) < 1)
                 {
@@ -132,6 +132,13 @@ namespace FernNamespace
             //draw curve by points
             System.Drawing.Color color = System.Drawing.Color.FromArgb(100 / level, (200 * level) % 255, 0);
             g.DrawCurve(new System.Drawing.Pen(color, 5 / level), branchPoints);
+        }
+
+        private double getLength(int level, double currentLength, int positionFromTrunk, int points)
+        {
+            double smoothnessFactor = .25;
+            double newLength = (currentLength - Math.Atan(smoothnessFactor * positionFromTrunk - points * smoothnessFactor / 2) * 40 - Math.Pow(positionFromTrunk, .25) * 50) / 5;
+            return newLength > 0 ? newLength : 2;
         }
 
         private void createLeaf(double x, double y, double direction, double size) { 
