@@ -24,7 +24,7 @@ namespace FernNamespace
     class Fern
     {
         private static double SEGLENGTH = 50;
-        private static int LEVEL_MAX = 2;
+        private static int LEVEL_MAX = 3;
         private static int BRANCHES = 1;
         private static double STEM_CLEARANCE = .3;
         private static System.Drawing.Color leafColor = System.Drawing.Color.FromArgb(200, 10, 100, 10);
@@ -109,9 +109,6 @@ namespace FernNamespace
                 double newDirectionOffset = getNewBranchDirectionOffset(shifted_i, points, level);
                 double newLength = getLength(level, length, (int) shifted_i, points);
                 
-                //if (skippingBranch(density, shifted_i))
-                  //  continue;
-
                 if (position < STEM_CLEARANCE)
                     continue;
 
@@ -137,9 +134,7 @@ namespace FernNamespace
 
         private double getNewBranchDirectionOffset(int i, int points, int level)
         {
-            double changePosition = .2;
-            double realism = -1 * Math.Atan(i - points * changePosition);
-            return 3 * Math.PI / 8 + realism * Math.PI / 16;
+            return 3 * Math.PI / 8 + random.NextDouble() * Math.PI / 16;
         }
 
         private double getLength(int level, double currentLength, int positionFromTrunk, int points)
