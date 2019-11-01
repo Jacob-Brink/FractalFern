@@ -24,12 +24,11 @@ namespace FernNamespace
     class Fern
     {
         private static double SEGLENGTH = 50;
-        private static int LEVEL_MAX = 3;
+        private static int LEVEL_MAX = 2;
         private static int BRANCHES = 1;
         private static double STEM_CLEARANCE = .3;
         private static System.Drawing.Color leafColor = System.Drawing.Color.FromArgb(200, 10, 100, 10);
-        private static System.Drawing.Color branchColor = System.Drawing.Color.FromArgb(100, 0, 0, 0);
-
+        private static System.Drawing.Color branchColor = System.Drawing.Color.FromArgb(100, 20, 10, 0);
 
         private Graphics g;
         private int width, height;
@@ -55,9 +54,9 @@ namespace FernNamespace
             direction = 0;// random.NextDouble() * Math.PI / 2;
             for (int j = 0; j < BRANCHES; j++)
             {
-                length = randomInRange(2) + 1600;
+                length = randomInRange(2) + 800;
                 //direction += random.NextDouble() * Math.PI / 200  +  2 * Math.PI / BRANCHES;
-                growBranch(1, width/2, height/2, size * length, direction, turnbias, 0, density);
+                generateMain(1, length, density, new System.Drawing.Point(width / 2, height / 2), direction, turnbias, size, 0);
             }
         }
 
@@ -66,20 +65,15 @@ namespace FernNamespace
             return random.NextDouble() * range - range / 2;
         }
 
-        private void growBranch(int level, double x, double y, double length, double direction, double turnbias, double age, double density)
-        {
+        
 
-            //System.Drawing.Point point = generateStem(level, length / 4, density, new System.Drawing.Point((int)x, (int)y), direction, turnbias, age);
-            generateMain(level, length, density, new System.Drawing.Point((int) x, (int) y), direction, turnbias, age);
-        }
-
-        private void generateMain(int level, double length, double density, System.Drawing.Point startPoint, double direction, double turnbias, double age)
+        private void generateMain(int level, double length, double density, System.Drawing.Point startPoint, double direction, double turnbias, double size, double turnDirection)
         {
             if (level > LEVEL_MAX)
                 return;
 
             //creates number of points relative to length
-            int points = 20;
+            int points = 80;
 
             //get segmentLength
             double segmentLength = length / points;
@@ -102,8 +96,9 @@ namespace FernNamespace
                 position = (double) i / branchPoints.Length;
                 shifted_i = (int) (i -  STEM_CLEARANCE * branchPoints.Length);
 
-                currentOffset = getDirectionOffset(level, age, i, points, direction, lastDirectionOffset, turnbias);
-                //direction += currentOffset;
+                currentOffset = getDirectionOffset(level, size, i, points, direction, lastDirectionOffset);
+                //currentOffset = turnDirection != 0 ? currentOffset * turnDirection : currentOffset * ((random.NextDouble() * 2) < 1 ? -1 : 1); 
+                direction += currentOffset;
                 lastDirectionOffset = currentOffset;
 
                 x += segmentLength * Math.Cos(direction);
@@ -111,7 +106,7 @@ namespace FernNamespace
 
                 branchPoints[i] = new System.Drawing.Point((int)x, (int)y);
 
-                double newDirectionOffset = getNewBranchDirectionOffset(shifted_i, points);
+                double newDirectionOffset = getNewBranchDirectionOffset(shifted_i, points, level);
                 double newLength = getLength(level, length, (int) shifted_i, points);
                 
                 //if (skippingBranch(density, shifted_i))
@@ -125,26 +120,26 @@ namespace FernNamespace
                     newDirectionOffset = 0;
 
                 //grow branches staggered
-                if ((shifted_i % 2) < 1)
+                if ((shifted_i % 3) < 1)
                 {
-                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * 1, turnbias, age, density * 5);
+                    generateMain(level+1, newLength, density, new System.Drawing.Point((int)x, (int)y), direction + newDirectionOffset, turnbias, size, 1);
                 }
-                else
+                else if ((shifted_i % 3) < 2)
                 {
-                    growBranch(level + 1, x, y, newLength, direction + newDirectionOffset * -1, turnbias, age, density * 5);
+                    generateMain(level+1, newLength, density, new System.Drawing.Point((int)x, (int)y), direction - newDirectionOffset, turnbias, size, -1);
                 }
 
             }
 
             //draw curve by points
-            g.DrawCurve(new System.Drawing.Pen(branchColor, 5 / level), branchPoints);
+            g.DrawCurve(new System.Drawing.Pen(branchColor, 10 / level), branchPoints);
         }
 
-        private double getNewBranchDirectionOffset(int i, int points)
+        private double getNewBranchDirectionOffset(int i, int points, int level)
         {
-            double smoothness = 10;
-            double realism = -1 * Math.Atan(i) * Math.PI / 7;
-            return Math.PI / 2 + realism;
+            double changePosition = .2;
+            double realism = -1 * Math.Atan(i - points * changePosition);
+            return 3 * Math.PI / 8 + realism * Math.PI / 16;
         }
 
         private double getLength(int level, double currentLength, int positionFromTrunk, int points)
@@ -155,7 +150,7 @@ namespace FernNamespace
             {
                 double smoothnessFactor = .25;
                 double changeLocation = 1 / 5; //where fern changes direction by a significant amount ___/--------
-                newLength = (currentLength - Math.Atan(smoothnessFactor * positionFromTrunk - points * changeLocation) * 30 - Math.Pow(positionFromTrunk, .15) * 50) / 5;
+                newLength = (currentLength - Math.Atan(smoothnessFactor * positionFromTrunk - points * changeLocation) * 30 - Math.Pow(positionFromTrunk, .15) * 50) / 4;
             } else
             {
                 newLength = (currentLength - positionFromTrunk * 2) / 3;
@@ -164,22 +159,14 @@ namespace FernNamespace
             return newLength > 0 ? newLength : 2;
         }
 
-        private bool skippingBranch(int density, int i)
-        {
-            double num = 1 / (density + .01) + 1;
-            return true;
-        }
-
-        private double getDirectionOffset(int level, double age, int positionFromTrunk, int points, double currentDirection, double lastDirectionOffset, double turnbias)
+        private double getDirectionOffset(int level, double age, int positionFromTrunk, int points, double currentDirection, double lastDirectionOffset)
         {
             //spiral for young unfurled ferns
             double directionOffsetRange = Math.PI / (4 * level * points);
             double nextOffset = (randomInRange(Math.PI / 4 + .05 * Math.Pow(positionFromTrunk, 2))) % directionOffsetRange;
 
-            nextOffset += age * positionFromTrunk * .005;
-
             nextOffset += lastDirectionOffset * .75;
-            return nextOffset;
+            return 0;
         }
 
 
