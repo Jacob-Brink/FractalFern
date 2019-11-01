@@ -106,7 +106,7 @@ namespace FernNamespace
                 {
                     for (int b = -1; b < 2; b += 2)
                     {
-                        //createLeaf(x, y, direction + Math.PI / 2 * b, 10 / i * .25 + 4);
+                        createLeaf(x, y, direction + Math.PI / 2 * b, 10 / i * .25 + 4);
                     }
                     continue;
                 }
@@ -143,7 +143,7 @@ namespace FernNamespace
 
         private double getDirectionOffset(int level, double age, int positionFromTrunk, int points, double currentDirection, double lastDirectionOffset, double turnbias)
         {
-            double directionOffsetRange = Math.PI / (8 * level * points);
+            double directionOffsetRange = Math.PI / (4 * level * points);
             double nextOffset = randomInRange(Math.PI / 4 + .05 * Math.Pow(positionFromTrunk, 2)) % directionOffsetRange;
             nextOffset = random.NextDouble() < turnbias ? nextOffset : 0;
             nextOffset += lastDirectionOffset * .75;
