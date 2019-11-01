@@ -36,6 +36,8 @@ namespace FernNamespace
         {
             using (Graphics g = Graphics.FromImage(_canvas))
             {
+                if (g == null)
+                    return;
                 g.Clear(System.Drawing.Color.White);
                 Fern f = new Fern(directionFallOffSlider.Value, lengthFallOffSlider.Value, turnSlider.Value, g, (int) this.Width, (int) this.Height);
 

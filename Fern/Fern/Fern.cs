@@ -11,7 +11,7 @@ namespace FernNamespace
      */
     class Fern
     {
-        private static int START_LENGTH = 250;
+        private static int START_LENGTH = 200;
         private static Color leafColor = Color.FromArgb(200, 10, 100, 10);
         private static Color branchColor = Color.FromArgb(200, 20, 10, 0);
 
@@ -43,11 +43,11 @@ namespace FernNamespace
             if (level > 2)
                 return;
 
-            int points = 5;
+            int points = 20;
             Point[] pointList = new Point[points];
 
-            double x = 100;
-            double y = 100;
+            double x = startX;
+            double y = startY;
             double segmentDistance;
             double position;
             for (int pointCount = 0; pointCount < points; pointCount++)
@@ -56,7 +56,7 @@ namespace FernNamespace
 
                 pointList[pointCount] = new Point((int)x, (int)y);
 
-                segmentDistance = getNewSegmentDistance(length, position);
+                segmentDistance = getNewSegmentDistance(length, position, points);
 
                 x += segmentDistance * Math.Cos(direction);
                 y -= segmentDistance * Math.Sin(direction);
@@ -68,9 +68,9 @@ namespace FernNamespace
 
         }
 
-        private double getNewSegmentDistance(double length, double position)
+        private double getNewSegmentDistance(double length, double position, int points)
         {
-            return length / position;
+            return length / points;
         }
         
         private double getNewDirection(double currentDirection, double position, double fallOff)
