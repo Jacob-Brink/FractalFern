@@ -76,8 +76,8 @@ namespace FernNamespace
 
                 if (level == LEVEL_MAX && pointCount % 5 < 1)
                 {
-                    createLeaf(x, y, getNewDirection(direction, position, 1), getNewLength(length, position, lengthFallOff, level), getLeafColor(age, position));
-                    createLeaf(x, y, getNewDirection(direction, position, -1), getNewLength(length, position, lengthFallOff, level), getLeafColor(age, position));
+                    createLeaf(x, y, getNewDirection(direction, position, 1), getNewLength(length, position, lengthFallOff, level)/2, getLeafColor(age, position));
+                    createLeaf(x, y, getNewDirection(direction, position, -1), getNewLength(length, position, lengthFallOff, level)/2, getLeafColor(age, position));
                 }
                     
 
@@ -131,13 +131,13 @@ namespace FernNamespace
             System.Drawing.Point[] points = new System.Drawing.Point[3];
             
             points[0].X = (int)(x + width / 2 * Math.Cos(direction - Math.PI / 2));
-            points[0].Y = (int)(y + width / 2 * Math.Sin(direction - Math.PI / 2));
+            points[0].Y = (int)(y - width / 2 * Math.Sin(direction - Math.PI / 2));
 
             points[1].X = (int)(x + width / 2 * Math.Cos(Math.PI / 2 + direction));
-            points[1].Y = (int)(y + width / 2 * Math.Sin(Math.PI / 2 + direction));
+            points[1].Y = (int)(y - width / 2 * Math.Sin(Math.PI / 2 + direction));
             
-            points[2].X = (int)(x + height * 1.2 * Math.Cos(direction));
-            points[2].Y = (int)(y + height * 1.2 * Math.Sin(direction));
+            points[2].X = (int)(x + height * Math.Cos(direction));
+            points[2].Y = (int)(y - height * Math.Sin(direction));
             
             graphics.FillPolygon(new SolidBrush(color), points);
         }
