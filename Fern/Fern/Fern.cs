@@ -11,11 +11,11 @@ namespace FernNamespace
      */
     class Fern
     {
-        private static int START_LENGTH = 400;
-        private static int LEVEL_MAX = 2;
-        private static Color leafColor = Color.FromArgb(100, 10, 100, 10);
+        private static int START_LENGTH = 500;
+        private static int LEVEL_MAX = 3;
+        private static Color limeColor = Color.FromArgb(140, 210, 0, 10);
+        private static Color darkGreenColor = Color.FromArgb(88, 130, 0);
         private static Color branchColor = Color.FromArgb(200, 20, 10, 0);
-        private static Pen leafPen = new Pen(leafColor, 1);
 
         private Graphics graphics;
         private int width, height;
@@ -76,8 +76,8 @@ namespace FernNamespace
 
                 if (level == LEVEL_MAX && pointCount % 5 < 1)
                 {
-                    createLeaf(x, y, getNewDirection(direction, position, 1), getNewLength(length, position, lengthFallOff, level)/2, getLeafColor(age, position));
-                    createLeaf(x, y, getNewDirection(direction, position, -1), getNewLength(length, position, lengthFallOff, level)/2, getLeafColor(age, position));
+                    createLeaf(x, y, getNewDirection(direction, position, 1), getNewLength(length, position, lengthFallOff, level)/1.2, getLeafColor(age, position));
+                    createLeaf(x, y, getNewDirection(direction, position, -1), getNewLength(length, position, lengthFallOff, level)/1.2, getLeafColor(age, position));
                 }
                     
 
@@ -93,9 +93,9 @@ namespace FernNamespace
 
         private Color getLeafColor(double age, double position)
         {
-            byte r = (byte) (random.NextDouble() * 255 * position);
-            byte g =(byte) (random.NextDouble() * 255 / age / position);
-            return Color.FromArgb(r, g, 20);
+            byte r = (byte) ((limeColor.R - darkGreenColor.R)*position + darkGreenColor.R);
+            byte g =(byte) ((limeColor.G - darkGreenColor.G) * position + darkGreenColor.G);
+            return Color.FromArgb(r, g, (byte) 200);
         }
 
         private double getDirectionOffset(double turnBias, int points)
