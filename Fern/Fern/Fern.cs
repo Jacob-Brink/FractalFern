@@ -13,8 +13,8 @@ namespace FernNamespace
     {
         private static int START_LENGTH = 500;
         private static int LEVEL_MAX = 3;
-        private static Color limeColor = Color.FromArgb(140, 210, 0, 10);
-        private static Color darkGreenColor = Color.FromArgb(88, 130, 0);
+        private static Color limeColor = Color.FromArgb(133, 235, 255); 
+        private static Color darkGreenColor = Color.FromArgb(224, 65, 224);
         private static Color branchColor = Color.FromArgb(200, 20, 10, 0);
 
         private Graphics graphics;
@@ -67,7 +67,7 @@ namespace FernNamespace
 
                 segmentDistance = getNewSegmentDistance(length, position, points);
 
-                currentDirectionOffset = getDirectionOffset(turnBias, points);
+                currentDirectionOffset = getDirectionOffset(turnBias, points, level);
 
                 direction += currentDirectionOffset;
 
@@ -93,14 +93,20 @@ namespace FernNamespace
 
         private Color getLeafColor(double age, double position)
         {
-            byte r = (byte) ((limeColor.R - darkGreenColor.R)*position + darkGreenColor.R);
-            byte g =(byte) ((limeColor.G - darkGreenColor.G) * position + darkGreenColor.G);
-            return Color.FromArgb(r, g, (byte) 200);
+            int redDiff = darkGreenColor.R - limeColor.R;
+            int greenDiff = darkGreenColor.G - limeColor.G;
+            double randomRatio = .25;
+            double positionRatio = 1 - randomRatio;
+            byte r = (byte) (redDiff*position*positionRatio + randomRatio * random.NextDouble() * redDiff + limeColor.R);
+            byte g =(byte) (redDiff * position * positionRatio + randomRatio * random.NextDouble() * greenDiff + limeColor.G);
+            return Color.FromArgb(r, g, (byte) 10);
         }
 
-        private double getDirectionOffset(double turnBias, int points)
+        private double getDirectionOffset(double turnBias, int points, int level)
         {
             double offset = Math.PI / 2 / points;
+            if (level == 1)
+                return offset * random.NextDouble() - offset / 2;
             return (random.NextDouble() > turnBias) ? -1 * offset : offset;// + .25* lastDirectionOffset;
         }
 
