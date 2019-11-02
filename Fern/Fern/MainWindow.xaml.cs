@@ -39,7 +39,7 @@ namespace FernNamespace
                 if (g == null)
                     return;
                 g.Clear(System.Drawing.Color.White);
-                Fern f = new Fern(directionFallOffSlider.Value, lengthFallOffSlider.Value, turnSlider.Value, g, (int) this.Width, (int) this.Height);
+                Fern f = new Fern(ageSlider.Value, lengthFallOffSlider.Value, turnSlider.Value, g, (int) this.Width, (int) this.Height);
 
                 BitmapImage bitmapImage = new BitmapImage();
                 bitmapImage.BeginInit();

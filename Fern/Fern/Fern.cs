@@ -36,7 +36,11 @@ namespace FernNamespace
             this.height = height;
             this.graphics = graphics;
             this.random = new Random();
-            generateMain(1, width / 2, height / 2, 0, START_LENGTH, directionFallOff, lengthFallOff, turnBias);
+
+            for (int i = 0; i < 3; i++)
+            {
+                generateMain(1, width / 2, height / 2, i * Math.PI * 2 /3, START_LENGTH, directionFallOff, lengthFallOff, turnBias);
+            }
         }
 
         private void generateMain(int level, double startX, double startY, double direction, double length, double directionFallOff, double lengthFallOff, double turnBias)
@@ -62,8 +66,7 @@ namespace FernNamespace
 
                 segmentDistance = getNewSegmentDistance(length, position, points);
 
-                currentDirectionOffset = getDirectionOffset(direction, position, turnBias, lastDirectionOffset);
-                lastDirectionOffset = currentDirectionOffset;
+                currentDirectionOffset = getDirectionOffset(direction, position, turnBias, lastDirectionOffset, points);
 
                 direction += currentDirectionOffset;
 
@@ -78,9 +81,9 @@ namespace FernNamespace
                     
 
                 if (pointCount % 3 < 1)
-                    generateMain(level + 1, x, y, getNewDirection(direction, position, directionFallOff, 1), getNewLength(length, position, lengthFallOff, level), directionFallOff / 2, lengthFallOff / 4, turnBias / 4);
+                    generateMain(level + 1, x, y, getNewDirection(direction, position, directionFallOff, 1), getNewLength(length, position, lengthFallOff, level), directionFallOff / 2, lengthFallOff / 4, turnBias);
                 else if (pointCount % 3 < 2)
-                    generateMain(level + 1, x, y, getNewDirection(direction, position, directionFallOff, -1), getNewLength(length, position, lengthFallOff, level), directionFallOff / 2, lengthFallOff / 4, turnBias / 4);
+                    generateMain(level + 1, x, y, getNewDirection(direction, position, directionFallOff, -1), getNewLength(length, position, lengthFallOff, level), directionFallOff / 2, lengthFallOff / 4, 1-turnBias);
             }
 
             graphics.DrawCurve(new Pen(branchColor, 1), pointList);
@@ -88,10 +91,10 @@ namespace FernNamespace
         }
 
 
-        private double getDirectionOffset(double currentDirection, double position, double turnBias, double lastDirectionOffset)
+        private double getDirectionOffset(double currentDirection, double position, double turnBias, double lastDirectionOffset, int points)
         {
-            double offsetRange = Math.PI / 30;
-            return offsetRange * (random.NextDouble()-.5);// + .25* lastDirectionOffset;
+            double offset = Math.PI / 2 / points;
+            return (random.NextDouble() > turnBias) ? -1 * offset : offset;// + .25* lastDirectionOffset;
         }
 
         private double getNewSegmentDistance(double length, double position, int points)
