@@ -12,7 +12,7 @@ namespace FernNamespace
     class Fern
     {
         private static int START_LENGTH = 400;
-        private static int LEVEL_MAX = 3;
+        private static int LEVEL_MAX = 2;
         private static Color leafColor = Color.FromArgb(100, 10, 100, 10);
         private static Color branchColor = Color.FromArgb(200, 20, 10, 0);
         private static Pen leafPen = new Pen(leafColor, 1);
@@ -29,21 +29,22 @@ namespace FernNamespace
          * Turnbias: how likely to turn right vs. left (0=always left, 0.5 = 50/50, 1.0 = always right)
          * canvas: the canvas that the fern will be drawn on
          */
-        public Fern(double directionFallOff, double lengthFallOff, double turnBias, Graphics graphics, int width, int height)
+        public Fern(double age, double lengthFallOff, double turnBias, Graphics graphics, int width, int height)
         {
             //set instance variables
             this.width = width;
             this.height = height;
             this.graphics = graphics;
             this.random = new Random();
+            int branchCount = 3;
 
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < branchCount; i++)
             {
-                generateMain(1, width / 2, height / 2, i * Math.PI * 2 /3, START_LENGTH, directionFallOff, lengthFallOff, turnBias);
+                generateMain(1, width / 2, height / 2, i * Math.PI * 2 /branchCount, START_LENGTH, age, lengthFallOff, turnBias);
             }
         }
 
-        private void generateMain(int level, double startX, double startY, double direction, double length, double directionFallOff, double lengthFallOff, double turnBias)
+        private void generateMain(int level, double startX, double startY, double direction, double length, double  age, double lengthFallOff, double turnBias)
         {
 
             if (level > LEVEL_MAX)
@@ -66,7 +67,7 @@ namespace FernNamespace
 
                 segmentDistance = getNewSegmentDistance(length, position, points);
 
-                currentDirectionOffset = getDirectionOffset(direction, position, turnBias, lastDirectionOffset, points);
+                currentDirectionOffset = getDirectionOffset(turnBias, points);
 
                 direction += currentDirectionOffset;
 
@@ -75,23 +76,29 @@ namespace FernNamespace
 
                 if (level == LEVEL_MAX && pointCount % 5 < 1)
                 {
-                    createLeaf(x, y, getNewDirection(direction, position, directionFallOff, 1), getNewLength(length, position, lengthFallOff, level), 200, 100, 0);
-                    createLeaf(x, y, getNewDirection(direction, position, directionFallOff, -1), getNewLength(length, position, lengthFallOff, level), 200, 100, 0);
+                    createLeaf(x, y, getNewDirection(direction, position, 1), getNewLength(length, position, lengthFallOff, level), getLeafColor(age, position));
+                    createLeaf(x, y, getNewDirection(direction, position, -1), getNewLength(length, position, lengthFallOff, level), getLeafColor(age, position));
                 }
                     
 
                 if (pointCount % 3 < 1)
-                    generateMain(level + 1, x, y, getNewDirection(direction, position, directionFallOff, 1), getNewLength(length, position, lengthFallOff, level), directionFallOff / 2, lengthFallOff / 4, turnBias);
+                    generateMain(level + 1, x, y, getNewDirection(direction, position, 1), getNewLength(length, position, lengthFallOff, level), age, lengthFallOff / 4, turnBias);
                 else if (pointCount % 3 < 2)
-                    generateMain(level + 1, x, y, getNewDirection(direction, position, directionFallOff, -1), getNewLength(length, position, lengthFallOff, level), directionFallOff / 2, lengthFallOff / 4, 1-turnBias);
+                    generateMain(level + 1, x, y, getNewDirection(direction, position, -1), getNewLength(length, position, lengthFallOff, level), age, lengthFallOff / 4, 1-turnBias);
             }
 
             graphics.DrawCurve(new Pen(branchColor, 1), pointList);
 
         }
 
+        private Color getLeafColor(double age, double position)
+        {
+            byte r = (byte) (random.NextDouble() * 255 * position);
+            byte g =(byte) (random.NextDouble() * 255 / age / position);
+            return Color.FromArgb(r, g, 20);
+        }
 
-        private double getDirectionOffset(double currentDirection, double position, double turnBias, double lastDirectionOffset, int points)
+        private double getDirectionOffset(double turnBias, int points)
         {
             double offset = Math.PI / 2 / points;
             return (random.NextDouble() > turnBias) ? -1 * offset : offset;// + .25* lastDirectionOffset;
@@ -103,7 +110,7 @@ namespace FernNamespace
             return (length - position * length / 2) / points;
         }
         
-        private double getNewDirection(double currentDirection, double position, double fallOff, int direction)
+        private double getNewDirection(double currentDirection, double position, int direction)
         {
             return Math.Pow(1 - position, .5) * Math.PI / 2 * direction + currentDirection;
         }
@@ -118,7 +125,7 @@ namespace FernNamespace
             return (currentLength - (.75 * Math.Atan(Math.Pow(position*(1-minPosition)+minPosition, fallOff * factor + .25 * Math.Pow(level / LEVEL_MAX, 2)) - changePosition)) * currentLength ) / reducingFactor;
         }
 
-        private void createLeaf(double x, double y, double direction, double size, byte r, byte g, byte b) {
+        private void createLeaf(double x, double y, double direction, double size, Color color) {
             double height = 2 * size;
             double width = 1 * size;
             System.Drawing.Point[] points = new System.Drawing.Point[3];
@@ -132,7 +139,7 @@ namespace FernNamespace
             points[2].X = (int)(x + height * 1.2 * Math.Cos(direction));
             points[2].Y = (int)(y + height * 1.2 * Math.Sin(direction));
             
-            graphics.DrawPolygon(leafPen, points);
+            graphics.FillPolygon(new SolidBrush(color), points);
         }
 
     }
