@@ -103,7 +103,7 @@ namespace FernNamespace
             byte r = (byte) (redDiff * position * positionRatio + randomRatio * random.NextDouble() * redDiff + limeColor.R);
             byte g = (byte) (redDiff * position * positionRatio + randomRatio * random.NextDouble() * greenDiff + limeColor.G);
             byte b = (byte)(blueDiff * position * positionRatio + randomRatio * random.NextDouble() * blueDiff + limeColor.B);
-            return Color.FromArgb(r, g, b);
+            return Color.FromArgb(150, r, g, b);
         }
 
         private double getDirectionOffset(double turnBias, int points, int level)
