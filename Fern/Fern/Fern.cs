@@ -12,8 +12,10 @@ namespace FernNamespace
     class Fern
     {
         private static int START_LENGTH = 400;
+        private static int LEVEL_MAX = 3;
         private static Color leafColor = Color.FromArgb(200, 10, 100, 10);
         private static Color branchColor = Color.FromArgb(200, 20, 10, 0);
+        private static Pen leafPen = new Pen(leafColor, 1);
 
         private Graphics graphics;
         private int width, height;
@@ -40,7 +42,7 @@ namespace FernNamespace
         private void generateMain(int level, double startX, double startY, double direction, double length, double directionFallOff, double lengthFallOff, double turnBias)
         {
 
-            if (level > 3)
+            if (level > LEVEL_MAX)
                 return;
 
             int points = (int) (20 * level * 1.2);
@@ -61,15 +63,26 @@ namespace FernNamespace
                 x += segmentDistance * Math.Cos(direction);
                 y -= segmentDistance * Math.Sin(direction);
 
-                
+                if (level == LEVEL_MAX && pointCount % 5 < 1)
+                {
+                    createLeaf(x, y, getNewDirection(direction, position, directionFallOff, 1), getNewLength(length, position, lengthFallOff, level), 200, 100, 0);
+                    createLeaf(x, y, getNewDirection(direction, position, directionFallOff, -1), getNewLength(length, position, lengthFallOff, level), 200, 100, 0);
+                }
+                    
+
                 if (pointCount % 3 < 1)
-                    generateMain(level + 1, x, y, getNewDirection(direction, position, directionFallOff, 1), getNewLength(length, position, lengthFallOff), directionFallOff / 2, lengthFallOff / 4, turnBias / 4);
+                    generateMain(level + 1, x, y, getNewDirection(direction, position, directionFallOff, 1), getNewLength(length, position, lengthFallOff, level), directionFallOff / 2, lengthFallOff / 4, turnBias / 4);
                 else if (pointCount % 3 < 2)
-                    generateMain(level + 1, x, y, getNewDirection(direction, position, directionFallOff, -1), getNewLength(length, position, lengthFallOff), directionFallOff / 2, lengthFallOff / 4, turnBias / 4);
+                    generateMain(level + 1, x, y, getNewDirection(direction, position, directionFallOff, -1), getNewLength(length, position, lengthFallOff, level), directionFallOff / 2, lengthFallOff / 4, turnBias / 4);
             }
 
             graphics.DrawCurve(new Pen(branchColor, 1), pointList);
 
+        }
+
+        private double getNewDirection(double currentDirection, double position, double turnBias)
+        {
+            return currentDirection;
         }
 
         private double getNewSegmentDistance(double length, double position, int points)
@@ -83,17 +96,17 @@ namespace FernNamespace
             return Math.Pow(1 - position, .5) * Math.PI / 2 * direction + currentDirection;
         }
 
-        private double getNewLength(double currentLength, double position, double fallOff)
+        private double getNewLength(double currentLength, double position, double fallOff, int level)
         {
             double factor = 5;
             int reducingFactor = 5;
             double changePosition = .5;
             double minPosition = .05;
 
-            return (currentLength - (Math.Atan(Math.Pow(position*(1-minPosition)+minPosition, fallOff * factor) - changePosition)) * currentLength ) / reducingFactor;
+            return (currentLength - (.75 * Math.Atan(Math.Pow(position*(1-minPosition)+minPosition, fallOff * factor + .25 * Math.Pow(level / LEVEL_MAX, 2)) - changePosition)) * currentLength ) / reducingFactor;
         }
 
-        private void createLeaf(double x, double y, double direction, double size) {
+        private void createLeaf(double x, double y, double direction, double size, byte r, byte g, byte b) {
             double height = 2 * size;
             double width = 1 * size;
             System.Drawing.Point[] points = new System.Drawing.Point[3];
@@ -107,7 +120,7 @@ namespace FernNamespace
             points[2].X = (int)(x + height * 1.2 * Math.Cos(direction));
             points[2].Y = (int)(y + height * 1.2 * Math.Sin(direction));
             
-            graphics.DrawPolygon(new System.Drawing.Pen(leafColor, 4), points);
+            graphics.DrawPolygon(leafPen, points);
         }
 
     }
