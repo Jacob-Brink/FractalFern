@@ -13,9 +13,9 @@
         
         <Slider Height="24" HorizontalAlignment="Left" Margin="12,85,0,0" Name="ageSlider" VerticalAlignment="Top" Width="175" Value="0.5" Maximum="1.0" Minimum="0.0" />
         <Slider Height="23" HorizontalAlignment="Left" Margin="12,151,0,0" Name="lengthFallOffSlider" VerticalAlignment="Top" Width="175" Value="0.5" Maximum="1.0" Minimum="0.0" />
-        <Slider Height="23" HorizontalAlignment="Left" Margin="12,214,0,0" Name="turnSlider" VerticalAlignment="Top" Width="175" Value="0.0" Maximum="1.0" Minimum="0.0" />
+        <Slider Height="23" HorizontalAlignment="Left" Margin="12,214,0,0" Name="turnSlider" VerticalAlignment="Top" Width="175" Value=".5" Maximum=".99" Minimum="0.01" />
         <Button Content="Draw" Height="37" HorizontalAlignment="Left" Margin="48,269,0,0" Name="button1" VerticalAlignment="Top" Width="101" Click="button1_Click" />
-        <Label Content="Direction Fall Off" Height="28" Margin="84,61,501,0" Name="label1" VerticalAlignment="Top" />
+        <Label Content="Drought - Rainy" Height="28" Margin="84,61,501,0" Name="label1" VerticalAlignment="Top" />
         <Label Content="Length Fall Off" Height="28" HorizontalAlignment="Left" Margin="77,125,0,0" Name="label2" VerticalAlignment="Top" />
         <Label Content="Turn Bias" Height="28" HorizontalAlignment="Left" Margin="70,188,0,0" Name="label3" VerticalAlignment="Top" />
     </Grid>

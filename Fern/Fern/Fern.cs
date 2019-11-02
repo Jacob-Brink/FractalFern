@@ -13,8 +13,8 @@ namespace FernNamespace
     {
         private static int START_LENGTH = 500;
         private static int LEVEL_MAX = 3;
-        private static Color limeColor = Color.FromArgb(133, 235, 255); 
-        private static Color darkGreenColor = Color.FromArgb(224, 65, 224);
+        private Color limeColor = Color.FromArgb(39, 92, 0); 
+        private Color darkGreenColor = Color.FromArgb(81, 143, 36);
         private static Color branchColor = Color.FromArgb(200, 20, 10, 0);
 
         private Graphics graphics;
@@ -31,6 +31,8 @@ namespace FernNamespace
          */
         public Fern(double age, double lengthFallOff, double turnBias, Graphics graphics, int width, int height)
         {
+            limeColor = Color.FromArgb((byte)(age * 100 + 39), 92, 0);
+            darkGreenColor = Color.FromArgb((byte)(age * 100 + 81), 143, 36);
             //set instance variables
             this.width = width;
             this.height = height;
@@ -95,11 +97,13 @@ namespace FernNamespace
         {
             int redDiff = darkGreenColor.R - limeColor.R;
             int greenDiff = darkGreenColor.G - limeColor.G;
+            int blueDiff = darkGreenColor.B - limeColor.B;
             double randomRatio = .25;
             double positionRatio = 1 - randomRatio;
-            byte r = (byte) (redDiff*position*positionRatio + randomRatio * random.NextDouble() * redDiff + limeColor.R);
-            byte g =(byte) (redDiff * position * positionRatio + randomRatio * random.NextDouble() * greenDiff + limeColor.G);
-            return Color.FromArgb(r, g, (byte) 10);
+            byte r = (byte) (redDiff * position * positionRatio + randomRatio * random.NextDouble() * redDiff + limeColor.R);
+            byte g = (byte) (redDiff * position * positionRatio + randomRatio * random.NextDouble() * greenDiff + limeColor.G);
+            byte b = (byte)(blueDiff * position * positionRatio + randomRatio * random.NextDouble() * blueDiff + limeColor.B);
+            return Color.FromArgb(r, g, b);
         }
 
         private double getDirectionOffset(double turnBias, int points, int level)
