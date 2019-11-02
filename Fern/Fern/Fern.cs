@@ -43,7 +43,7 @@ namespace FernNamespace
             if (level > 3)
                 return;
 
-            int points = 20 * level;
+            int points = (int) (20 * level * 1.2);
             Point[] pointList = new Point[points];
 
             double x = startX;
@@ -63,9 +63,9 @@ namespace FernNamespace
 
                 
                 if (pointCount % 3 < 1)
-                    generateMain(level + 1, x, y, getNewDirection(direction, position, directionFallOff, 1), getNewLength(length, position, lengthFallOff), directionFallOff / 2, lengthFallOff / 2, turnBias / 4);
+                    generateMain(level + 1, x, y, getNewDirection(direction, position, directionFallOff, 1), getNewLength(length, position, lengthFallOff), directionFallOff / 2, lengthFallOff / 4, turnBias / 4);
                 else if (pointCount % 3 < 2)
-                    generateMain(level + 1, x, y, getNewDirection(direction, position, directionFallOff, -1), getNewLength(length, position, lengthFallOff), directionFallOff / 2, lengthFallOff / 2, turnBias / 4);
+                    generateMain(level + 1, x, y, getNewDirection(direction, position, directionFallOff, -1), getNewLength(length, position, lengthFallOff), directionFallOff / 2, lengthFallOff / 4, turnBias / 4);
             }
 
             graphics.DrawCurve(new Pen(branchColor, 1), pointList);
@@ -80,19 +80,17 @@ namespace FernNamespace
         
         private double getNewDirection(double currentDirection, double position, double fallOff, int direction)
         {
-            //double directionOffsetRange = Math.PI / 6;
-            //double directionOffsetMin = Math.PI / 2;
-            //double changePosition = 0.2;
-            //return currentDirection - Math.Atan(Math.Pow(position, fallOff*2) - changePosition) * directionOffsetRange + directionOffsetMin;
             return Math.Pow(1 - position, .5) * Math.PI / 2 * direction + currentDirection;
         }
 
         private double getNewLength(double currentLength, double position, double fallOff)
         {
-            double factor = 2;
-            int reducingFactor = 4;
+            double factor = 5;
+            int reducingFactor = 5;
             double changePosition = .5;
-            return (currentLength - Math.Atan(Math.Pow(position, fallOff * factor+1) - changePosition) * currentLength ) / reducingFactor;
+            double minPosition = .05;
+
+            return (currentLength - (Math.Atan(Math.Pow(position*(1-minPosition)+minPosition, fallOff * factor) - changePosition)) * currentLength ) / reducingFactor;
         }
 
         private void createLeaf(double x, double y, double direction, double size) {
