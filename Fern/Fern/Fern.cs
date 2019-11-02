@@ -42,15 +42,17 @@ namespace FernNamespace
 
             for (int i = 0; i < branchCount; i++)
             {
-                generateMain(1, width / 2, height / 2, i * Math.PI * 2 /branchCount, START_LENGTH, age, lengthFallOff, turnBias);
+                generateMain(1, width / 2, height / 2, i * Math.PI * 2 /branchCount, START_LENGTH, age, lengthFallOff, turnBias, true);
             }
         }
 
-        private void generateMain(int level, double startX, double startY, double direction, double length, double  age, double lengthFallOff, double turnBias)
+        private void generateMain(int level, double startX, double startY, double direction, double length, double  age, double lengthFallOff, double turnBias, bool right)
         {
 
             if (level > LEVEL_MAX)
                 return;
+
+            
 
             int points = (int) (20 * level * 1.2);
             Point[] pointList = new Point[points];
@@ -69,7 +71,15 @@ namespace FernNamespace
 
                 segmentDistance = getNewSegmentDistance(length, position, points);
 
-                currentDirectionOffset = getDirectionOffset(turnBias, points, level);
+                if(right == true)
+                {
+                    currentDirectionOffset = getDirectionOffset(1 - turnBias, points, level);
+                }
+                else
+                {
+                    currentDirectionOffset = getDirectionOffset(turnBias, points, level);
+                }
+                    
 
                 direction += currentDirectionOffset;
 
@@ -84,9 +94,9 @@ namespace FernNamespace
                     
 
                 if (pointCount % 3 < 1)
-                    generateMain(level + 1, x, y, getNewDirection(direction, position, 1), getNewLength(length, position, lengthFallOff, level), age, lengthFallOff / 4, turnBias);
+                    generateMain(level + 1, x, y, getNewDirection(direction, position, 1), getNewLength(length, position, lengthFallOff, level), age, lengthFallOff / 4, turnBias, false);
                 else if (pointCount % 3 < 2)
-                    generateMain(level + 1, x, y, getNewDirection(direction, position, -1), getNewLength(length, position, lengthFallOff, level), age, lengthFallOff / 4, 1-turnBias);
+                    generateMain(level + 1, x, y, getNewDirection(direction, position, -1), getNewLength(length, position, lengthFallOff, level), age, lengthFallOff / 4, turnBias, true);
             }
 
             graphics.DrawCurve(new Pen(branchColor, 1), pointList);
