@@ -11,7 +11,7 @@ namespace FernNamespace
      */
     class Fern
     {
-        private static int START_LENGTH = 300;
+        private static int START_LENGTH = 400;
         private static Color leafColor = Color.FromArgb(200, 10, 100, 10);
         private static Color branchColor = Color.FromArgb(200, 20, 10, 0);
 
@@ -40,10 +40,10 @@ namespace FernNamespace
         private void generateMain(int level, double startX, double startY, double direction, double length, double directionFallOff, double lengthFallOff, double turnBias)
         {
 
-            if (level > 2)
+            if (level > 3)
                 return;
 
-            int points = 20;
+            int points = 20 * level;
             Point[] pointList = new Point[points];
 
             double x = startX;
@@ -61,14 +61,14 @@ namespace FernNamespace
                 x += segmentDistance * Math.Cos(direction);
                 y -= segmentDistance * Math.Sin(direction);
 
-
-
-
-                generateMain(level + 1, x, y, getNewDirection(direction, position, directionFallOff), getNewLength(length, position, lengthFallOff), directionFallOff / 2, lengthFallOff / 2, turnBias / 4);
-                generateMain(level + 1, x, y, -getNewDirection(direction, position, directionFallOff), getNewLength(length, position, lengthFallOff), directionFallOff / 2, lengthFallOff / 2, turnBias / 4);
+                
+                if (pointCount % 3 < 1)
+                    generateMain(level + 1, x, y, getNewDirection(direction, position, directionFallOff, 1), getNewLength(length, position, lengthFallOff), directionFallOff / 2, lengthFallOff / 2, turnBias / 4);
+                else if (pointCount % 3 < 2)
+                    generateMain(level + 1, x, y, getNewDirection(direction, position, directionFallOff, -1), getNewLength(length, position, lengthFallOff), directionFallOff / 2, lengthFallOff / 2, turnBias / 4);
             }
 
-            graphics.DrawCurve(new Pen(branchColor, 3), pointList);
+            graphics.DrawCurve(new Pen(branchColor, 1), pointList);
 
         }
 
@@ -78,21 +78,21 @@ namespace FernNamespace
             return (length - position * length / 2) / points;
         }
         
-        private double getNewDirection(double currentDirection, double position, double fallOff)
+        private double getNewDirection(double currentDirection, double position, double fallOff, int direction)
         {
             //double directionOffsetRange = Math.PI / 6;
             //double directionOffsetMin = Math.PI / 2;
             //double changePosition = 0.2;
             //return currentDirection - Math.Atan(Math.Pow(position, fallOff*2) - changePosition) * directionOffsetRange + directionOffsetMin;
-            return Math.Pow(1 - position, .5) * Math.PI / 2 + currentDirection;
+            return Math.Pow(1 - position, .5) * Math.PI / 2 * direction + currentDirection;
         }
 
         private double getNewLength(double currentLength, double position, double fallOff)
         {
-            double factor = 200;
+            double factor = 2;
             int reducingFactor = 4;
             double changePosition = .5;
-            return (currentLength - Math.Atan(Math.Pow(position, fallOff*2) - changePosition) * factor) / reducingFactor;
+            return (currentLength - Math.Atan(Math.Pow(position, fallOff * factor+1) - changePosition) * currentLength ) / reducingFactor;
         }
 
         private void createLeaf(double x, double y, double direction, double size) {
