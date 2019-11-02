@@ -13,7 +13,7 @@ namespace FernNamespace
     {
         private static int START_LENGTH = 400;
         private static int LEVEL_MAX = 3;
-        private static Color leafColor = Color.FromArgb(200, 10, 100, 10);
+        private static Color leafColor = Color.FromArgb(100, 10, 100, 10);
         private static Color branchColor = Color.FromArgb(200, 20, 10, 0);
         private static Pen leafPen = new Pen(leafColor, 1);
 
@@ -35,7 +35,7 @@ namespace FernNamespace
             this.width = width;
             this.height = height;
             this.graphics = graphics;
-
+            this.random = new Random();
             generateMain(1, width / 2, height / 2, 0, START_LENGTH, directionFallOff, lengthFallOff, turnBias);
         }
 
@@ -52,6 +52,8 @@ namespace FernNamespace
             double y = startY;
             double segmentDistance;
             double position;
+            double currentDirectionOffset = 0;
+            double lastDirectionOffset = currentDirectionOffset;
             for (int pointCount = 0; pointCount < points; pointCount++)
             {
                 position = (double)pointCount / points;
@@ -59,6 +61,11 @@ namespace FernNamespace
                 pointList[pointCount] = new Point((int)x, (int)y);
 
                 segmentDistance = getNewSegmentDistance(length, position, points);
+
+                currentDirectionOffset = getDirectionOffset(direction, position, turnBias, lastDirectionOffset);
+                lastDirectionOffset = currentDirectionOffset;
+
+                direction += currentDirectionOffset;
 
                 x += segmentDistance * Math.Cos(direction);
                 y -= segmentDistance * Math.Sin(direction);
@@ -80,9 +87,11 @@ namespace FernNamespace
 
         }
 
-        private double getNewDirection(double currentDirection, double position, double turnBias)
+
+        private double getDirectionOffset(double currentDirection, double position, double turnBias, double lastDirectionOffset)
         {
-            return currentDirection;
+            double offsetRange = Math.PI / 30;
+            return offsetRange * (random.NextDouble()-.5);// + .25* lastDirectionOffset;
         }
 
         private double getNewSegmentDistance(double length, double position, int points)
